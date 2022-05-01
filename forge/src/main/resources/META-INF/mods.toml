@@ -1,0 +1,33 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "All Rights Reserved"
+issueTrackerURL = "https://github.com/Toadstool-Studios/Goodall/issues"
+
+[[mods]]
+    modId = "goodall"
+    version = "${version}"
+    displayName = "Goodall"
+    displayURL = "https://www.curseforge.com/minecraft/mc-mods/goodall"
+    authors = "Dev - ThatGravyBoat, Artist - Frogipher, Animator - condorcrest"
+    description = "Welcome to the Safari! Goodall, inspired by famous english primatologist Jane Goodall is a Minecraft mod meant to educate players about the animals that inhabit this beautiful planet."
+
+[[dependencies.goodall]]
+    modId = "forge"
+    mandatory = true
+    versionRange = "[40,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.goodall]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "[1.18.2,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.goodall]]
+    modId = "geckolib3"
+    mandatory = true
+    versionRange = "[3.0.12,)"
+    ordering = "NONE"
+    side = "CLIENT"

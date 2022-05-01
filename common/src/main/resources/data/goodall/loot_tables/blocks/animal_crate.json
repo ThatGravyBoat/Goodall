@@ -1,0 +1,57 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "condition": "minecraft:match_tool",
+                  "predicate": {
+                    "enchantments": [
+                      {
+                        "enchantment": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:copy_nbt",
+                  "source": "block_entity",
+                  "ops": [
+                    {
+                      "source": "Sound",
+                      "target": "BlockEntityTag.Sound",
+                      "op": "replace"
+                    },
+                    {
+                      "source": "Entity",
+                      "target": "BlockEntityTag.Entity",
+                      "op": "replace"
+                    }
+                  ]
+                }
+              ],
+              "name": "goodall:animal_crate"
+            },
+            {
+              "type": "minecraft:item",
+              "name": "goodall:animal_crate"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

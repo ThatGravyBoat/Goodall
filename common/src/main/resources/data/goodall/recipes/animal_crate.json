@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#@#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:trapped_chest"
+    },
+    "@": {
+      "item": "minecraft:scaffolding"
+    }
+  },
+  "result": {
+    "item": "goodall:animal_crate"
+  }
+}

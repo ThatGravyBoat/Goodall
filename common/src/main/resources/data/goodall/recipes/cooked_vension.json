@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "goodall:raw_venison"
+  },
+  "result": "goodall:cooked_venison",
+  "experience": 0.35,
+  "cookingtime": 200
+}

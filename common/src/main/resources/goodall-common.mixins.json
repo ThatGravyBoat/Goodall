@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "tech.thatgravyboat.goodall.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [],
+  "mixins": [
+    "MobEntityAccessor",
+    "MobEntityMixin",
+    "PillagerEntityMixin",
+    "PolarBearEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

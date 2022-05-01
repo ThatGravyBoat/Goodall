@@ -1,0 +1,48 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {
+      "item": "minecraft:spyglass"
+    },
+    "title": {
+      "translate": "advancements.goodall.my_eyes_are_up_here.title"
+    },
+    "description": {
+      "translate": "advancements.goodall.my_eyes_are_up_here.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "look_at_booby": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "predicate": {
+              "player": {
+                "looking_at": {
+                  "type": "goodall:blue_footed_booby"
+                }
+              }
+            },
+            "entity": "this"
+          }
+        ],
+        "item": {
+          "items": [
+            "minecraft:spyglass"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "look_at_booby"
+    ]
+  ]
+}

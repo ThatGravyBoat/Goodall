@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "goodall",
+  "version": "${version}",
+  "name": "Goodall",
+  "description": "",
+  "authors": [
+    "Dev - ThatGravyBoat",
+    "Artist - Frogipher",
+    "Animator - condorcrest_"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/goodall",
+    "sources": "https://github.com/Toadstool-Studios/Goodall"
+  },
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "tech.thatgravyboat.goodall.fabric.GoodallFabric"
+    ],
+    "client": [
+      "tech.thatgravyboat.goodall.fabric.GoodallFabricClient"
+    ]
+  },
+  "mixins": [
+    "goodall.mixins.json",
+    "goodall-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.18.2",
+    "geckolib3": "*"
+  }
+}
