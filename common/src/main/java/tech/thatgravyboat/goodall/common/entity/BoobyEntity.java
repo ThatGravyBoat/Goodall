@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -29,9 +30,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.NonBreedingAnimal;
 import tech.thatgravyboat.goodall.common.entity.goals.FindTreasure;
+import tech.thatgravyboat.goodall.common.registry.ModSounds;
 
-public class BoobyEntity extends PathAwareEntity implements IAnimatable {
+public class BoobyEntity extends NonBreedingAnimal implements IAnimatable, IEntityModel {
 
     private static final TrackedData<Boolean> FISH = DataTracker.registerData(BoobyEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<BlockPos> TREASURE = DataTracker.registerData(BoobyEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
@@ -168,6 +173,20 @@ public class BoobyEntity extends PathAwareEntity implements IAnimatable {
     }
     //endregion
 
+    //region Sounds
+    @Nullable
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.BOOBY_AMBIENT.get();
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return ModSounds.BOOBY_HURT.get();
+    }
+    //endregion
+
     //region Animations
     private <E extends IAnimatable> PlayState walkCycle(AnimationEvent<E> event) {
         var builder = new AnimationBuilder();
@@ -190,6 +209,11 @@ public class BoobyEntity extends PathAwareEntity implements IAnimatable {
     @Override
     public AnimationFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.BOOBY;
     }
     //endregion
 }

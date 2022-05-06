@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LocalDifficulty;
@@ -32,13 +33,15 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.entity.goals.DumboShyGoal;
 import tech.thatgravyboat.goodall.common.lib.DumboVariant;
 import tech.thatgravyboat.goodall.common.registry.ModItems;
 
 import java.util.Random;
 
-public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable {
+public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable, IEntityModel {
 
     private static final TrackedData<Boolean> SHY = DataTracker.registerData(DumboEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> BUCKET = DataTracker.registerData(DumboEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -205,5 +208,16 @@ public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable 
     public AnimationFactory getFactory() {
         return factory;
     }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.DUMBO;
+    }
+
+    @Override
+    public Identifier getITexture() {
+        return getVariant().texture;
+    }
+
     //endregion
 }

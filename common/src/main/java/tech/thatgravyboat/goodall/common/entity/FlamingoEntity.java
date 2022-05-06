@@ -13,6 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -25,9 +27,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.Goodall;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.registry.ModEntities;
+import tech.thatgravyboat.goodall.common.registry.ModSounds;
 
-public class FlamingoEntity extends AnimalEntity implements IAnimatable {
+public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntityModel {
 
     private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(Items.COD);
 
@@ -68,6 +74,20 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable {
         return 1.1;
     }
 
+    //region Sounds
+    @Nullable
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.FLAMINGO_AMBIENT.get();
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return ModSounds.FLAMINGO_HURT.get();
+    }
+    //endregion
+
     //region Wings
     @Override
     public void tickMovement() {
@@ -104,6 +124,7 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable {
     }
     //endregion
 
+    //region Breeding
     @Nullable
     @Override
     public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
@@ -114,6 +135,7 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable {
     public boolean isBreedingItem(ItemStack stack) {
         return BREEDING_INGREDIENT.test(stack);
     }
+    //endregion
 
     //region Animations
     private <E extends IAnimatable> PlayState walkCycle(AnimationEvent<E> event) {
@@ -143,5 +165,16 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable {
     public AnimationFactory getFactory() {
         return factory;
     }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.FLAMINGO;
+    }
+
+    @Override
+    public Identifier getITexture() {
+        return this.isBaby() ? new Identifier(Goodall.MOD_ID, "textures/entity/baby_flamingo.png") : IEntityModel.super.getITexture();
+    }
+
     //endregion
 }

@@ -8,7 +8,7 @@ issueTrackerURL = "https://github.com/Toadstool-Studios/Goodall/issues"
     version = "${version}"
     displayName = "Goodall"
     displayURL = "https://www.curseforge.com/minecraft/mc-mods/goodall"
-    authors = "Dev - ThatGravyBoat, Artist - Frogipher, Animator - condorcrest"
+    authors = "Dev - ThatGravyBoat, Artist - Frogipher, Animator - condorcrest, Sound Designer - Mangoshorty"
     description = "Welcome to the Safari! Goodall, inspired by famous english primatologist Jane Goodall is a Minecraft mod meant to educate players about the animals that inhabit this beautiful planet."
 
 [[dependencies.goodall]]

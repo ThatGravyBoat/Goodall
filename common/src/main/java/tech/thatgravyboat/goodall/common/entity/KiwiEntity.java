@@ -18,8 +18,11 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.NonBreedingAnimal;
 
-public class KiwiEntity extends PathAwareEntity implements IAnimatable {
+public class KiwiEntity extends NonBreedingAnimal implements IAnimatable, IEntityModel {
 
     private final AnimationFactory factory = new AnimationFactory(this);
 
@@ -82,5 +85,10 @@ public class KiwiEntity extends PathAwareEntity implements IAnimatable {
     @Override
     public AnimationFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.KIWI;
     }
 }

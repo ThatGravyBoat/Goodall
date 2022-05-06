@@ -39,15 +39,13 @@ public class AnimalCrateBlockEntity extends BlockEntity {
     public void summonEntity(World world, BlockPos pos) {
         if (this.entity == null) return;
         if (!(world instanceof ServerWorld serverWorld)) return;
-        EntityType.fromNbt(this.entity).ifPresent(entityType -> {
-            Entity entity = entityType.create(serverWorld);
-            if (entity != null) {
+        EntityType.fromNbt(this.entity)
+            .map(type -> type.create(serverWorld))
+            .ifPresent(entity -> {
                 entity.readNbt(this.entity);
                 entity.updatePositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
                 serverWorld.spawnEntity(entity);
-            }
-        });
-
+            });
     }
 
     @Override

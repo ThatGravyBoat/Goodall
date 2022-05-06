@@ -8,6 +8,7 @@ import tech.thatgravyboat.goodall.common.entity.*;
 import tech.thatgravyboat.goodall.common.registry.ModBlocks;
 import tech.thatgravyboat.goodall.common.registry.ModEntities;
 import tech.thatgravyboat.goodall.common.registry.ModItems;
+import tech.thatgravyboat.goodall.common.registry.ModSounds;
 import tech.thatgravyboat.goodall.config.ConfigLoader;
 
 import java.util.Map;
@@ -22,6 +23,7 @@ public class Goodall {
         ModEntities.register();
         ModItems.register();
         ModBlocks.register();
+        ModSounds.register();
 
         ConfigLoader.registerConfig(CONFIG);
     }

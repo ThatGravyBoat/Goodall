@@ -17,8 +17,6 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.DolphinEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -41,12 +39,14 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.entity.base.WaterAnimalEntity;
 import tech.thatgravyboat.goodall.common.registry.ModEntities;
 
 import java.util.Random;
 
-public class ManateeEntity extends WaterAnimalEntity implements IAnimatable {
+public class ManateeEntity extends WaterAnimalEntity implements IAnimatable, IEntityModel {
 
     private static final TrackedData<Integer> MOISTNESS = DataTracker.registerData(ManateeEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(Items.SEAGRASS);
@@ -213,6 +213,11 @@ public class ManateeEntity extends WaterAnimalEntity implements IAnimatable {
     @Override
     public AnimationFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.MANATEE;
     }
     //endregion
 }

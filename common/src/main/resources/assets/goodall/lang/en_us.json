@@ -27,5 +27,12 @@
   "item.goodall.animal_crate.entity_name": "Animal: %s",
 
   "advancements.goodall.my_eyes_are_up_here.title": "Hey! My eyes are up here!",
-  "advancements.goodall.my_eyes_are_up_here.description": "Look at a Blue Footed Booby through a spyglass."
+  "advancements.goodall.my_eyes_are_up_here.description": "Look at a Blue Footed Booby through a spyglass.",
+
+  "subtitles.goodall.seal.ambient": "Seal Barking",
+  "subtitles.goodall.seal.hurt": "Seal Squeal",
+  "subtitles.goodall.flamingo.ambient": "Flamingo Honking",
+  "subtitles.goodall.flamingo.hurt": "Flamingo Squeal",
+  "subtitles.goodall.booby.ambient": "Blue Footed Booby Whistles",
+  "subtitles.goodall.booby.hurt": "Blue Footed Booby Squeal"
 }

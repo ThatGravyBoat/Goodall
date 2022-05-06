@@ -7,11 +7,13 @@
   "authors": [
     "Dev - ThatGravyBoat",
     "Artist - Frogipher",
-    "Animator - condorcrest_"
+    "Animator - condorcrest_",
+    "Sound Designer - Mangoshorty"
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/goodall",
-    "sources": "https://github.com/Toadstool-Studios/Goodall"
+    "sources": "https://github.com/Toadstool-Studios/Goodall",
+    "issues": "https://github.com/Toadstool-Studios/Goodall/issues"
   },
   "license": "All Rights Reserved",
   "environment": "*",

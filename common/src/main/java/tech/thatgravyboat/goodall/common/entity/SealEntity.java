@@ -10,6 +10,7 @@ import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -18,6 +19,7 @@ import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.PolarBearEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -34,10 +36,12 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.NonBreedingAnimal;
 import tech.thatgravyboat.goodall.common.entity.goals.seal.LandAndSeaWanderGoal;
 import tech.thatgravyboat.goodall.common.entity.goals.seal.SealSwimNavigation;
+import tech.thatgravyboat.goodall.common.registry.ModSounds;
 
-public class SealEntity extends PathAwareEntity implements IAnimatable {
+public class SealEntity extends NonBreedingAnimal implements IAnimatable {
 
     private static final TrackedData<Boolean> WHITE = DataTracker.registerData(SealEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
@@ -191,6 +195,20 @@ public class SealEntity extends PathAwareEntity implements IAnimatable {
     @Override
     public AnimationFactory getFactory() {
         return factory;
+    }
+    //endregion
+
+    //region Sounds
+    @Nullable
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.SEAL_AMBIENT.get();
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return ModSounds.SEAL_HURT.get();
     }
     //endregion
 }

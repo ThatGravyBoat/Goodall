@@ -3,8 +3,10 @@ package tech.thatgravyboat.goodall.mixin;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.PandaEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -29,6 +31,10 @@ public abstract class MobEntityMixin extends LivingEntity {
             if (result.isAccepted()) {
                 cir.setReturnValue(result);
             }
+        }
+        //noinspection ConstantConditions
+        if (stack.isOf(Items.FEATHER) && ((Object)this) instanceof PandaEntity panda) {
+            panda.setSneezing(true);
         }
     }
 

@@ -34,8 +34,7 @@ public class AnimalCrateBlockItem extends BlockItem {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        //noinspection ConstantConditions
-        if ((!stack.hasNbt() || !stack.getNbt().contains("BlockEntityTag")) && entity.getType().isIn(ALLOWED_ANIMALS)) {
+        if ((!stack.hasNbt() || !stack.getOrCreateNbt().contains("BlockEntityTag")) && entity.getType().isIn(ALLOWED_ANIMALS)) {
             NbtCompound entityTag = new NbtCompound();
             if (entity.saveNbt(entityTag)) {
                 entityTag.remove("UUID");

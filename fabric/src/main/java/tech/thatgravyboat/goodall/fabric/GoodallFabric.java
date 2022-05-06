@@ -13,6 +13,7 @@ import tech.thatgravyboat.goodall.common.registry.ModSpawns;
 import tech.thatgravyboat.goodall.common.registry.fabric.ModBlocksImpl;
 import tech.thatgravyboat.goodall.common.registry.fabric.ModEntitiesImpl;
 import tech.thatgravyboat.goodall.common.registry.fabric.ModItemsImpl;
+import tech.thatgravyboat.goodall.common.registry.fabric.ModSoundsImpl;
 import tech.thatgravyboat.goodall.config.fabric.ConfigLoaderImpl;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class GoodallFabric implements ModInitializer {
         ModItemsImpl.ITEMS.forEach((id, item) -> Registry.register(Registry.ITEM, new Identifier(Goodall.MOD_ID, id), item.get()));
         ModBlocksImpl.BLOCKS.forEach((id, block) -> Registry.register(Registry.BLOCK, new Identifier(Goodall.MOD_ID, id), block.get()));
         ModBlocksImpl.BLOCK_ENTITIES.forEach((id, block) -> Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(Goodall.MOD_ID, id), block.get()));
+        ModSoundsImpl.SOUNDS.forEach((id, sound) -> Registry.register(Registry.SOUND_EVENT, new Identifier(Goodall.MOD_ID, id), sound.get()));
 
         Map<EntityType<? extends LivingEntity>, DefaultAttributeContainer.Builder> attributes = new HashMap<>();
         Goodall.addEntityAttributes(attributes);

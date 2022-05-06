@@ -12,12 +12,14 @@ import net.minecraft.util.math.Vec3f;
 import software.bernie.geckolib3.geo.render.built.GeoBone;
 import software.bernie.geckolib3.util.RenderUtils;
 import tech.thatgravyboat.goodall.client.renderer.MobEntityRenderer;
+import tech.thatgravyboat.goodall.client.renderer.base.BaseModel;
+import tech.thatgravyboat.goodall.client.renderer.base.BaseRenderer;
 import tech.thatgravyboat.goodall.common.entity.FennecFoxEntity;
 
-public class FennecFoxRenderer extends MobEntityRenderer<FennecFoxEntity> {
+public class FennecFoxRenderer extends BaseRenderer<FennecFoxEntity> {
 
     public FennecFoxRenderer(EntityRendererFactory.Context ctx) {
-        super(ctx, new FennecFoxModel());
+        super(ctx, new BaseModel<>());
     }
 
     @Override
@@ -41,10 +43,5 @@ public class FennecFoxRenderer extends MobEntityRenderer<FennecFoxEntity> {
             bufferIn = rtb.getBuffer(RenderLayer.getEntityTranslucent(whTexture));
         }
         super.renderRecursively(bone, stack, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-    }
-
-    @Override
-    public RenderLayer getRenderType(FennecFoxEntity animatable, float partialTicks, MatrixStack stack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, Identifier textureLocation) {
-        return RenderLayer.getEntityTranslucent(textureLocation);
     }
 }

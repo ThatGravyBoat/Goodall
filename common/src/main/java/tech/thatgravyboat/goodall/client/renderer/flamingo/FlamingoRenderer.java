@@ -1,18 +1,17 @@
 package tech.thatgravyboat.goodall.client.renderer.flamingo;
 
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import tech.thatgravyboat.goodall.client.renderer.MobEntityRenderer;
+import tech.thatgravyboat.goodall.client.renderer.base.BaseModel;
+import tech.thatgravyboat.goodall.client.renderer.base.BaseRenderer;
 import tech.thatgravyboat.goodall.common.entity.FlamingoEntity;
 
-public class FlamingoRenderer extends MobEntityRenderer<FlamingoEntity> {
+public class FlamingoRenderer extends BaseRenderer<FlamingoEntity> {
 
     public FlamingoRenderer(EntityRendererFactory.Context ctx) {
-        super(ctx, new FlamingoModel());
+        super(ctx, new BaseModel<>());
     }
 
     @Override
@@ -22,10 +21,5 @@ public class FlamingoRenderer extends MobEntityRenderer<FlamingoEntity> {
         if (animatable.isBaby()) {
             stackIn.scale(0.5f, 0.5f, 0.5f);
         }
-    }
-
-    @Override
-    public RenderLayer getRenderType(FlamingoEntity animatable, float partialTicks, MatrixStack stack, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder, int packedLightIn, Identifier textureLocation) {
-        return RenderLayer.getEntityTranslucent(textureLocation);
     }
 }

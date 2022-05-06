@@ -63,34 +63,28 @@
     { "required": false, "id": "alexsmobs:capuchin_monkey" },
     { "required": false, "id": "alexsmobs:warped_toad" },
     { "required": false, "id": "alexsmobs:moose" },
-    { "required": false, "id": "alexsmobs:mimicube" },
     { "required": false, "id": "alexsmobs:raccoon" },
     { "required": false, "id": "alexsmobs:blobfish" },
     { "required": false, "id": "alexsmobs:seal" },
     { "required": false, "id": "alexsmobs:cockroach" },
     { "required": false, "id": "alexsmobs:shoebill" },
     { "required": false, "id": "alexsmobs:elephant" },
-    { "required": false, "id": "alexsmobs:soul_vulture" },
     { "required": false, "id": "alexsmobs:snow_leopard" },
     { "required": false, "id": "alexsmobs:crow" },
     { "required": false, "id": "alexsmobs:mantis_shrimp" },
     { "required": false, "id": "alexsmobs:stradpole" },
     { "required": false, "id": "alexsmobs:emu" },
     { "required": false, "id": "alexsmobs:platypus" },
-    { "required": false, "id": "alexsmobs:dropbear" },
     { "required": false, "id": "alexsmobs:tasnabuab_devil" },
     { "required": false, "id": "alexsmobs:kangaroo" },
     { "required": false, "id": "alexsmobs:cachalot_whale" },
     { "required": false, "id": "alexsmobs:leafcutter_ant" },
-    { "required": false, "id": "alexsmobs:enderiophage" },
     { "required": false, "id": "alexsmobs:bald_eagle" },
     { "required": false, "id": "alexsmobs:tiger" },
     { "required": false, "id": "alexsmobs:tarantula_hawk" },
     { "required": false, "id": "alexsmobs:frilled_shark" },
     { "required": false, "id": "alexsmobs:mimic_octopus" },
     { "required": false, "id": "alexsmobs:seagull" },
-    { "required": false, "id": "alexsmobs:froststalker" },
-    { "required": false, "id": "alexsmobs:tusklin" },
     { "required": false, "id": "alexsmobs:laviathan" },
     { "required": false, "id": "alexsmobs:cosmaw" },
     { "required": false, "id": "alexsmobs:toucan" },
@@ -108,6 +102,15 @@
     { "required": false, "id": "alexsmobs:sea_bear" },
     { "required": false, "id": "alexsmobs:devils_hole_pupfish" },
     { "required": false, "id": "alexsmobs:catfish" },
-    { "required": false, "id": "alexsmobs:flying_fish" }
+    { "required": false, "id": "alexsmobs:flying_fish" },
+
+    { "required": false, "id": "duckling:duck" },
+
+    { "required": false, "id": "sprout:elephant" },
+    { "required": false, "id": "sprout:bounce_bug" },
+
+    { "required": false, "id": "hedgehog:hedgehog" }
+
+
   ]
 }

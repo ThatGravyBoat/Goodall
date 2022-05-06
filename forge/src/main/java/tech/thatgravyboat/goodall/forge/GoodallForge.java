@@ -19,10 +19,7 @@ import software.bernie.geckolib3.GeckoLib;
 import tech.thatgravyboat.goodall.Goodall;
 import tech.thatgravyboat.goodall.common.registry.ModSpawns;
 import tech.thatgravyboat.goodall.common.registry.SpawnData;
-import tech.thatgravyboat.goodall.common.registry.forge.ModBlocksImpl;
-import tech.thatgravyboat.goodall.common.registry.forge.ModEntitiesImpl;
-import tech.thatgravyboat.goodall.common.registry.forge.ModItemsImpl;
-import tech.thatgravyboat.goodall.common.registry.forge.ModSpawnsImpl;
+import tech.thatgravyboat.goodall.common.registry.forge.*;
 import tech.thatgravyboat.goodall.config.forge.ConfigLoaderImpl;
 
 import java.util.HashMap;
@@ -48,6 +45,7 @@ public class GoodallForge {
         ModItemsImpl.ITEMS.register(bus);
         ModBlocksImpl.BLOCKS.register(bus);
         ModBlocksImpl.BLOCK_ENTITIES.register(bus);
+        ModSoundsImpl.SOUNDS.register(bus);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> GoodallForgeClient::init);
         MinecraftForge.EVENT_BUS.register(this);

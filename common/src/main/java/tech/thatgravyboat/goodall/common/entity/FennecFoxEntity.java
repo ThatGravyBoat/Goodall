@@ -29,12 +29,14 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.entity.base.ItemPicker;
 import tech.thatgravyboat.goodall.common.entity.goals.PickupItemGoal;
 
 import java.util.function.Predicate;
 
-public class FennecFoxEntity extends TameableEntity implements ItemPicker, IAnimatable {
+public class FennecFoxEntity extends TameableEntity implements ItemPicker, IAnimatable, IEntityModel {
 
     private static final Predicate<LivingEntity> ATTACK_PREDICATE = entity -> entity instanceof ChickenEntity || entity instanceof RabbitEntity;
     private static final Predicate<LivingEntity> FLEE_PREDICATE = (entity) -> !entity.isSneaky() && EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.test(entity);
@@ -203,6 +205,11 @@ public class FennecFoxEntity extends TameableEntity implements ItemPicker, IAnim
     @Override
     public AnimationFactory getFactory() {
         return factory;
+    }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.FENNEC;
     }
     //endregion
 }

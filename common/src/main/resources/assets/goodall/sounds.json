@@ -1,0 +1,49 @@
+{
+  "flamingo.ambient": {
+    "subtitle": "subtitles.goodall.flamingo.ambient",
+    "sounds": [
+      "goodall:flamingo-1",
+      "goodall:flamingo-2"
+    ]
+  },
+  "flamingo.hurt": {
+    "subtitle": "subtitles.goodall.flamingo.hurt",
+    "sounds": [
+      "goodall:flamingo-hurt"
+    ]
+  },
+  "booby.ambient": {
+    "subtitle": "subtitles.goodall.booby.ambient",
+    "sounds": [
+      "goodall:booby-1",
+      "goodall:booby-2",
+      "goodall:booby-3",
+      "goodall:booby-4"
+    ]
+  },
+  "booby.hurt": {
+    "subtitle": "subtitles.goodall.booby.hurt",
+    "sounds": [
+      "goodall:booby-hurt"
+    ]
+  },
+  "seal.ambient": {
+    "subtitle": "subtitles.goodall.seal.ambient",
+    "sounds": [
+      {
+        "name": "goodall:seal-1",
+        "volume": 0.4
+      },
+      {
+        "name": "goodall:seal-2",
+        "volume": 0.4
+      }
+    ]
+  },
+  "seal.hurt": {
+    "subtitle": "subtitles.goodall.seal.hurt",
+    "sounds": [
+      "goodall:seal-hurt"
+    ]
+  }
+}

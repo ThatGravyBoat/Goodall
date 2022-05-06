@@ -24,10 +24,13 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.NonBreedingAnimal;
 
 import java.util.UUID;
 
-public class RedDeerEntity extends PathAwareEntity implements Angerable, IAnimatable {
+public class RedDeerEntity extends NonBreedingAnimal implements Angerable, IAnimatable, IEntityModel {
 
     private static final TrackedData<Boolean> CHARGING = DataTracker.registerData(RedDeerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final UniformIntProvider ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
@@ -190,6 +193,11 @@ public class RedDeerEntity extends PathAwareEntity implements Angerable, IAnimat
     @Override
     public AnimationFactory getFactory() {
         return this.factory;
+    }
+
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.REDDEER;
     }
     //endregion
 }
