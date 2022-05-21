@@ -1,5 +1,6 @@
 package tech.thatgravyboat.goodall.common.entity.goals;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -8,6 +9,7 @@ import net.minecraft.tag.ConfiguredStructureFeatureTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import tech.thatgravyboat.goodall.common.entity.BoobyEntity;
@@ -59,8 +61,11 @@ public class FindTreasure extends Goal {
         BlockPos blockPos = this.mob.getTreasurePos();
         if ((new BlockPos(blockPos.getX(), this.mob.getY(), blockPos.getZ())).isWithinDistance(this.mob.getPos(), 4.0D) || this.noPathToStructure) {
             if (!this.noPathToStructure) {
-                if (world.isAir(blockPos) && !world.getBlockState(blockPos.down()).isOf(ModBlocks.CROSS.get())) {
-                    world.setBlockState(blockPos, ModBlocks.CROSS.get().getDefaultState());
+                if (this.mob.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
+                    BlockState down = world.getBlockState(blockPos.down());
+                    if (world.isTopSolid(blockPos.down(), this.mob) && world.isAir(blockPos) && !down.isOf(ModBlocks.CROSS.get())) {
+                        world.setBlockState(blockPos, ModBlocks.CROSS.get().getDefaultState());
+                    }
                 }
                 world.sendEntityStatus(this.mob, (byte)38);
             }

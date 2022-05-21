@@ -2,7 +2,6 @@ package tech.thatgravyboat.goodall.common.registry;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnRestriction;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -18,41 +17,41 @@ public class ModSpawns {
 
     public static void registerSpawns() {
         Rhino rhino = Goodall.CONFIG.spawnConfig.rhino;
-        registerSpawn(Biome.Category.SAVANNA, new SpawnData(ModEntities.RHINO.get(), SpawnGroup.CREATURE, rhino.weight, rhino.min, rhino.max));
+        registerSpawn(Biome.Category.SAVANNA, new SpawnData(ModEntities.RHINO.get(), rhino.weight, rhino.min, rhino.max));
 
         Dumbo dumbo = Goodall.CONFIG.spawnConfig.dumboOctopus;
-        SpawnData dumboSpawnData = new SpawnData(ModEntities.DUMBO.get(), SpawnGroup.WATER_AMBIENT, dumbo.weight, dumbo.min, dumbo.max);
+        SpawnData dumboSpawnData = new SpawnData(ModEntities.DUMBO.get(), dumbo.weight, dumbo.min, dumbo.max);
         registerSpawn(BiomeKeys.DEEP_OCEAN, dumboSpawnData);
         registerSpawn(BiomeKeys.DEEP_COLD_OCEAN, dumboSpawnData);
         registerSpawn(BiomeKeys.DEEP_LUKEWARM_OCEAN, dumboSpawnData);
 
         Booby booby = Goodall.CONFIG.spawnConfig.blueFootedBooby;
-        registerSpawn(Biome.Category.BEACH, new SpawnData(ModEntities.BOOBY.get(), SpawnGroup.CREATURE, booby.weight, booby.min, booby.max));
+        registerSpawn(Biome.Category.BEACH, new SpawnData(ModEntities.BOOBY.get(), booby.weight, booby.min, booby.max));
 
         FennecFox fennecFox = Goodall.CONFIG.spawnConfig.fennecFox;
-        registerSpawn(Biome.Category.DESERT, new SpawnData(ModEntities.FENNEC_FOX.get(), SpawnGroup.CREATURE, fennecFox.weight, fennecFox.min, fennecFox.max));
+        registerSpawn(Biome.Category.DESERT, new SpawnData(ModEntities.FENNEC_FOX.get(), fennecFox.weight, fennecFox.min, fennecFox.max));
 
         Kiwi kiwi = Goodall.CONFIG.spawnConfig.kiwi;
-        registerSpawn(Biome.Category.JUNGLE, new SpawnData(ModEntities.KIWI.get(), SpawnGroup.CREATURE, kiwi.weight, kiwi.min, kiwi.max));
+        registerSpawn(Biome.Category.JUNGLE, new SpawnData(ModEntities.KIWI.get(), kiwi.weight, kiwi.min, kiwi.max));
 
         Manatee manatee = Goodall.CONFIG.spawnConfig.manatee;
-        registerSpawn(BiomeKeys.OCEAN, new SpawnData(ModEntities.MANATEE.get(), SpawnGroup.WATER_AMBIENT, manatee.weight, manatee.min, manatee.max));
+        registerSpawn(BiomeKeys.OCEAN, new SpawnData(ModEntities.MANATEE.get(), manatee.weight, manatee.min, manatee.max));
 
         Seal seal = Goodall.CONFIG.spawnConfig.seal;
-        SpawnData sealSpawnData = new SpawnData(ModEntities.SEAL.get(), SpawnGroup.WATER_AMBIENT, seal.weight, seal.min, seal.max);
+        SpawnData sealSpawnData = new SpawnData(ModEntities.SEAL.get(), seal.weight, seal.min, seal.max);
         registerSpawn(BiomeKeys.STONY_SHORE, sealSpawnData);
         registerSpawn(Biome.Category.BEACH, sealSpawnData);
         registerSpawn(BiomeKeys.FROZEN_OCEAN, sealSpawnData);
 
         RedDeer redDeer = Goodall.CONFIG.spawnConfig.redDeer;
-        registerSpawn(Biome.Category.FOREST, new SpawnData(ModEntities.RED_DEER.get(), SpawnGroup.CREATURE, redDeer.weight, redDeer.min, redDeer.max));
+        registerSpawn(Biome.Category.FOREST, new SpawnData(ModEntities.RED_DEER.get(), redDeer.weight, redDeer.min, redDeer.max));
 
         WhiteDeer whiteTailedDeer = Goodall.CONFIG.spawnConfig.whiteTailedDeer;
-        registerSpawn(Biome.Category.FOREST, new SpawnData(ModEntities.WHITE_DEER.get(), SpawnGroup.CREATURE, whiteTailedDeer.weight, whiteTailedDeer.min, whiteTailedDeer.max));
-        registerSpawn(BiomeKeys.FLOWER_FOREST, new SpawnData(ModEntities.WHITE_DEER.get(), SpawnGroup.CREATURE, whiteTailedDeer.weight+5, whiteTailedDeer.min, whiteTailedDeer.max));
+        registerSpawn(Biome.Category.FOREST, new SpawnData(ModEntities.WHITE_DEER.get(), whiteTailedDeer.weight, whiteTailedDeer.min, whiteTailedDeer.max));
+        registerSpawn(BiomeKeys.FLOWER_FOREST, new SpawnData(ModEntities.WHITE_DEER.get(), whiteTailedDeer.weight+5, whiteTailedDeer.min, whiteTailedDeer.max));
 
         Flamingo flamingo = Goodall.CONFIG.spawnConfig.flamingo;
-        SpawnData flamingoSpawnData = new SpawnData(ModEntities.FLAMINGO.get(), SpawnGroup.WATER_AMBIENT, flamingo.weight, flamingo.min, flamingo.max);
+        SpawnData flamingoSpawnData = new SpawnData(ModEntities.FLAMINGO.get(), flamingo.weight, flamingo.min, flamingo.max);
         registerSpawn(BiomeKeys.SWAMP, flamingoSpawnData);
         registerSpawn(BiomeKeys.JUNGLE, flamingoSpawnData);
     }

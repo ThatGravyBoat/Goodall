@@ -13,11 +13,11 @@ import tech.thatgravyboat.goodall.common.registry.SpawnData;
 
 public class ModSpawnsImpl {
     public static void registerSpawn(Biome.Category category, SpawnData data) {
-        BiomeModifications.addSpawn(BiomeSelectors.categories(category), data.group(), data.entityType(), data.weight(), data.min(), data.max());
+        BiomeModifications.addSpawn(BiomeSelectors.categories(category), data.entityType().getSpawnGroup(), data.entityType(), data.weight(), data.min(), data.max());
     }
 
     public static void registerSpawn(RegistryKey<Biome> biome, SpawnData data) {
-        BiomeModifications.addSpawn(BiomeSelectors.includeByKey(biome), data.group(), data.entityType(), data.weight(), data.min(), data.max());
+        BiomeModifications.addSpawn(BiomeSelectors.includeByKey(biome), data.entityType().getSpawnGroup(), data.entityType(), data.weight(), data.min(), data.max());
     }
 
     public static <T extends MobEntity> void setSpawnRules(EntityType<T> entityType, SpawnRestriction.Location location, Heightmap.Type type, SpawnRestriction.SpawnPredicate<T> predicate) {

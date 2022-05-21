@@ -62,11 +62,11 @@ public class GoodallForge {
             hasRegisteredSpawns = true;
         }
         for (SpawnData spawnData : ModSpawnsImpl.CATEGORY_SPAWNS.get(event.getCategory())) {
-            event.getSpawns().spawn(spawnData.group(),
+            event.getSpawns().spawn(spawnData.entityType().getSpawnGroup(),
                     new SpawnSettings.SpawnEntry(spawnData.entityType(), spawnData.weight(), spawnData.min(), spawnData.max()));
         }
         for (SpawnData spawnData : ModSpawnsImpl.BIOME_SPAWNS.get(event.getName())) {
-            event.getSpawns().spawn(spawnData.group(),
+            event.getSpawns().spawn(spawnData.entityType().getSpawnGroup(),
                     new SpawnSettings.SpawnEntry(spawnData.entityType(), spawnData.weight(), spawnData.min(), spawnData.max()));
         }
     }
