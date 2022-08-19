@@ -1,20 +1,20 @@
 package tech.thatgravyboat.goodall.common.entity.base;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public interface IEntityModel {
 
     EntityModel getEntityModel();
 
-    default Identifier getIModel() {
+    default ResourceLocation getIModel() {
         return getEntityModel().model;
     }
 
-    default Identifier getITexture() {
+    default ResourceLocation getITexture() {
         return getEntityModel().texture;
     }
 
-    default Identifier getIAnimation() {
+    default ResourceLocation getIAnimation() {
         return getEntityModel().animation;
     }
 }

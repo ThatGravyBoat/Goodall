@@ -1,22 +1,22 @@
 package tech.thatgravyboat.goodall.common.entity.goals;
 
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 import tech.thatgravyboat.goodall.common.entity.base.Sleeping;
 
 import java.util.EnumSet;
 
-public class SleepingGoal<T extends MobEntity & Sleeping> extends Goal {
+public class SleepingGoal<T extends Mob & Sleeping> extends Goal {
 
     private final T sleepingEntity;
 
     public SleepingGoal(T sleepingEntity) {
         this.sleepingEntity = sleepingEntity;
-        this.setControls(EnumSet.of(Control.MOVE, Control.JUMP, Control.LOOK));
+        this.setFlags(EnumSet.of(Flag.MOVE, Flag.JUMP, Flag.LOOK));
     }
 
     @Override
-    public boolean canStart() {
+    public boolean canUse() {
         return sleepingEntity.isSleeping();
     }
 

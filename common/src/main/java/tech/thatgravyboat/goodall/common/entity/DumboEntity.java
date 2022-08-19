@@ -1,30 +1,32 @@
 package tech.thatgravyboat.goodall.common.entity;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Bucketable;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.SquidEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.FluidTags;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.animal.Squid;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -35,53 +37,39 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
 import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
-import tech.thatgravyboat.goodall.common.entity.goals.DumboShyGoal;
 import tech.thatgravyboat.goodall.common.lib.DumboVariant;
 import tech.thatgravyboat.goodall.common.registry.ModItems;
 
-import java.util.Random;
+public class DumboEntity extends Squid implements Bucketable, IAnimatable, IEntityModel {
 
-public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable, IEntityModel {
-
-    private static final TrackedData<Boolean> SHY = DataTracker.registerData(DumboEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> BUCKET = DataTracker.registerData(DumboEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Integer> VARIANT = DataTracker.registerData(DumboEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final EntityDataAccessor<Boolean> BUCKET = SynchedEntityData.defineId(DumboEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(DumboEntity.class, EntityDataSerializers.INT);
 
     private final AnimationFactory factory = new AnimationFactory(this);
 
     private int healTicks;
 
-    public DumboEntity(EntityType<? extends SquidEntity> entityType, World world) {
-        super(entityType, world);
+    public DumboEntity(EntityType<? extends Squid> entityType, Level level) {
+        super(entityType, level);
     }
 
-    public static boolean canDumboSpawn(EntityType<? extends MobEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
-        if (spawnReason == SpawnReason.SPAWNER) return true;
+    public static boolean canDumboSpawn(EntityType<? extends Mob> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
+        if (spawnReason == MobSpawnType.SPAWNER) return true;
         int i = world.getSeaLevel() - 15;
         int j = i - 13;
-        return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.down()).isIn(FluidTags.WATER) && world.getBlockState(pos.up()).isOf(Blocks.WATER);
+        return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.below()).is(FluidTags.WATER) && world.getBlockState(pos.above()).is(Blocks.WATER);
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        this.dataTracker.startTracking(SHY, false);
-        this.dataTracker.startTracking(BUCKET, false);
-        this.dataTracker.startTracking(VARIANT, 0);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(BUCKET, false);
+        this.entityData.define(VARIANT, 0);
     }
 
     @Override
-    protected void initGoals() {
-        this.goalSelector.add(0, new DumboShyGoal(this));
-        super.initGoals();
-    }
-
-    @Override
-    public void tickMovement() {
-        super.tickMovement();
-        if (isShy()) {
-            setVelocity(0, 0, 0);
-        }
+    public void aiStep() {
+        super.aiStep();
         this.healTicks++;
         if (this.healTicks == 100) {
             this.healTicks = 0;
@@ -90,89 +78,81 @@ public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable,
     }
 
     @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        EntityData data = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-        if (!spawnReason.equals(SpawnReason.BUCKET)) this.dataTracker.set(VARIANT, DumboVariant.random(this.random).ordinal());
+    public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType spawnReason, @Nullable SpawnGroupData entityData, @Nullable CompoundTag tag) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnReason, entityData, tag);
+        if (!spawnReason.equals(MobSpawnType.BUCKET)) this.entityData.set(VARIANT, DumboVariant.random(this.random).ordinal());
         return data;
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity player) {
+    public boolean canBeLeashed(@NotNull Player player) {
         return false;
     }
 
     //region NBT
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        this.dataTracker.set(VARIANT, nbt.getInt("Variant"));
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        this.entityData.set(VARIANT, tag.getInt("Variant"));
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putInt("Variant", this.dataTracker.get(VARIANT));
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        tag.putInt("Variant", this.entityData.get(VARIANT));
     }
     //endregion
 
     //region Bucketable
     @Override
-    public boolean isFromBucket() {
-        return this.dataTracker.get(BUCKET);
+    public boolean fromBucket() {
+        return this.entityData.get(BUCKET);
     }
 
     @Override
     public void setFromBucket(boolean fromBucket) {
-        this.dataTracker.set(BUCKET, fromBucket);
+        this.entityData.set(BUCKET, fromBucket);
     }
 
     @Override
-    public void copyDataToStack(ItemStack stack) {
-        Bucketable.copyDataToStack(this, stack);
-        NbtCompound nbtCompound = stack.getOrCreateNbt();
-        nbtCompound.putInt("Variant", this.dataTracker.get(VARIANT));
+    public void saveToBucketTag(@NotNull ItemStack stack) {
+        Bucketable.saveDefaultDataToBucketTag(this, stack);
+        CompoundTag nbtCompound = stack.getOrCreateTag();
+        nbtCompound.putInt("Variant", this.entityData.get(VARIANT));
     }
 
     @Override
-    public void copyDataFromNbt(NbtCompound nbt) {
-        Bucketable.copyDataFromNbt(this, nbt);
-        this.dataTracker.set(VARIANT, Math.max(0, Math.min(2, nbt.getInt("Variant"))));
+    public void loadFromBucketTag(@NotNull CompoundTag tag) {
+        Bucketable.loadDefaultDataFromBucketTag(this, tag);
+        this.entityData.set(VARIANT, Math.max(0, Math.min(2, tag.getInt("Variant"))));
     }
 
     @Override
-    public ItemStack getBucketItem() {
+    public ItemStack getBucketItemStack() {
         return new ItemStack(ModItems.DUMBO_BUCKET.get());
     }
 
     @Override
-    public SoundEvent getBucketedSound() {
-        return SoundEvents.ITEM_BUCKET_FILL_FISH;
+    public SoundEvent getPickupSound() {
+        return SoundEvents.BUCKET_FILL_FISH;
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        return Bucketable.tryBucket(player, hand, this).orElse(super.interactMob(player, hand));
+    public InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
+        return Bucketable.bucketMobPickup(player, hand, this).orElse(super.mobInteract(player, hand));
     }
     //endregion
 
     //region State Management
-    public boolean isShy() {
-        return this.getAttacker() == null && this.dataTracker.get(SHY);
-    }
-
-    public void setShy(boolean shy) {
-        this.dataTracker.set(SHY, shy);
-    }
-
     public DumboVariant getVariant() {
-        return DumboVariant.getVariant(this.dataTracker.get(VARIANT));
+        return DumboVariant.getVariant(this.entityData.get(VARIANT));
     }
     //endregion
 
     //region Animations
     private <E extends IAnimatable> PlayState walkCycle(AnimationEvent<E> event) {
         var builder = new AnimationBuilder();
-        if (MathHelper.lerp(event.getPartialTick(), this.prevTentacleAngle, this.tentacleAngle) > 0.1f) {
+        if (Mth.lerp(event.getPartialTick(), this.oldTentacleAngle, this.tentacleAngle) > 0.1f) {
             builder.addAnimation("animation.dumbo.swim", true);
         } else {
             builder.addAnimation("animation.dumbo.idle", true);
@@ -185,23 +165,9 @@ public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable,
         return PlayState.CONTINUE;
     }
 
-    private <E extends IAnimatable> PlayState actionCycle(AnimationEvent<E> event) {
-        var builder = new AnimationBuilder();
-        if (this.isShy()) {
-            builder.addAnimation("animation.dumbo.shy").addAnimation("animation.dumbo.shy-end", true);
-        }
-        if (builder.getRawAnimationList().isEmpty()) {
-            event.getController().markNeedsReload();
-            return PlayState.STOP;
-        }
-        event.getController().setAnimation(builder);
-        return PlayState.CONTINUE;
-    }
-
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "walk_controller", 10, this::walkCycle));
-        data.addAnimationController(new AnimationController<>(this, "action_controller", 0, this::actionCycle));
+        data.addAnimationController(new AnimationController<>(this, "walk_controller", 5, this::walkCycle));
     }
 
     @Override
@@ -215,7 +181,7 @@ public class DumboEntity extends SquidEntity implements Bucketable, IAnimatable,
     }
 
     @Override
-    public Identifier getITexture() {
+    public ResourceLocation getITexture() {
         return getVariant().texture;
     }
 

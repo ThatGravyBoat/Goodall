@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "goodall:tortoise_scute"
+    }
+  },
+  "result": {
+    "item": "goodall:tortoise_scute_block",
+    "count": 2
+  }
+}

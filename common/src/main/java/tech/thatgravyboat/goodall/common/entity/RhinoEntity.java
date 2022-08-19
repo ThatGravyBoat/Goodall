@@ -1,32 +1,31 @@
 package tech.thatgravyboat.goodall.common.entity;
 
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.Angerable;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PillagerEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.TimeHelper;
-import net.minecraft.util.math.intprovider.UniformIntProvider;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -35,6 +34,9 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import tech.thatgravyboat.goodall.Goodall;
+import tech.thatgravyboat.goodall.common.entity.base.EntityModel;
+import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.entity.base.Sleeping;
 import tech.thatgravyboat.goodall.common.entity.goals.SleepingGoal;
 import tech.thatgravyboat.goodall.common.entity.goals.StompFireGoal;
@@ -42,23 +44,23 @@ import tech.thatgravyboat.goodall.common.registry.ModEntities;
 
 import java.util.UUID;
 
-public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable, Sleeping {
+public class RhinoEntity extends Animal implements NeutralMob, IAnimatable, Sleeping, IEntityModel {
 
-    private static final TrackedData<Boolean> WHITE = DataTracker.registerData(RhinoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> CHARGING = DataTracker.registerData(RhinoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> SLEEPING = DataTracker.registerData(RhinoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> STOMPING = DataTracker.registerData(RhinoEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> WHITE = SynchedEntityData.defineId(RhinoEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(RhinoEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(RhinoEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> STOMPING = SynchedEntityData.defineId(RhinoEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private static final UniformIntProvider ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
-    private static final UniformIntProvider SCARED_TIME = TimeHelper.betweenSeconds(25, 30);
-    private static final UniformIntProvider SLEEP_TIME = TimeHelper.betweenSeconds(10, 60);
+    private static final UniformInt ANGER_TIME_RANGE = TimeUtil.rangeOfSeconds(20, 39);
+    private static final UniformInt SCARED_TIME = TimeUtil.rangeOfSeconds(25, 30);
+    private static final UniformInt SLEEP_TIME = TimeUtil.rangeOfSeconds(10, 60);
 
-    private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(Items.DEAD_BUSH);
+    private static final Ingredient BREEDING_INGREDIENT = Ingredient.of(Items.DEAD_BUSH);
 
     private final AnimationFactory factory = new AnimationFactory(this);
 
     private int eatGrassTimer;
-    private EatGrassGoal eatGrassGoal;
+    private EatBlockGoal eatGrassGoal;
 
     private int angerTime;
     @Nullable
@@ -69,47 +71,47 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
 
     private boolean immuneToFire = false;
 
-    public RhinoEntity(EntityType<? extends AnimalEntity> entityType, World world) {
-        super(entityType, world);
-        this.stepHeight = 1f;
+    public RhinoEntity(EntityType<? extends Animal> entityType, Level level) {
+        super(entityType, level);
+        this.maxUpStep = 1f;
     }
 
-    public static DefaultAttributeContainer.Builder createRhinoAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 100.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0D)
-                .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 1D)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16.0D);
-    }
-
-    @Override
-    protected void initGoals() {
-        this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new SleepingGoal<>(this));
-        this.goalSelector.add(2, new AnimalMateGoal(this, 1.0D));
-        this.goalSelector.add(3, new TemptGoal(this, 1.0D, BREEDING_INGREDIENT, false));
-        this.goalSelector.add(4, new MeleeAttackGoal(this, 1.3D, false));
-        this.goalSelector.add(5, new FollowParentGoal(this, 0.45D));
-        this.goalSelector.add(6, (this.eatGrassGoal = new EatGrassGoal(this)));
-        this.goalSelector.add(7, new StompFireGoal(this, 0.8D, 3));
-        this.goalSelector.add(8, new WanderAroundFarGoal(this, 0.6D));
-        this.goalSelector.add(9, new LookAtEntityGoal(this, PlayerEntity.class, 6.0F));
-        this.goalSelector.add(10, new LookAroundGoal(this));
-
-        this.targetSelector.add(1, new RevengeGoal(this));
-        this.targetSelector.add(3, new ActiveTargetGoal<>(this, PlayerEntity.class, true, this::shouldAngerAt));
-        this.targetSelector.add(4, new ActiveTargetGoal<>(this, PillagerEntity.class, true, this::shouldAngerAt));
-        this.targetSelector.add(5, new UniversalAngerGoal<>(this, false));
+    public static AttributeSupplier.Builder createRhinoAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 100.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.3D)
+                .add(Attributes.ATTACK_DAMAGE, 6.0D)
+                .add(Attributes.ATTACK_KNOCKBACK, 1D)
+                .add(Attributes.FOLLOW_RANGE, 16.0D);
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        this.dataTracker.startTracking(WHITE, false);
-        this.dataTracker.startTracking(SLEEPING, false);
-        this.dataTracker.startTracking(CHARGING, false);
-        this.dataTracker.startTracking(STOMPING, false);
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new SleepingGoal<>(this));
+        this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.0D, BREEDING_INGREDIENT, false));
+        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.3D, false));
+        this.goalSelector.addGoal(5, new FollowParentGoal(this, 0.45D));
+        this.goalSelector.addGoal(6, (this.eatGrassGoal = new EatBlockGoal(this)));
+        this.goalSelector.addGoal(7, new StompFireGoal(this, 0.8D, 3));
+        this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 0.6D));
+        this.goalSelector.addGoal(9, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true, this::isAngryAt));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Pillager.class, true, this::isAngryAt));
+        this.targetSelector.addGoal(5, new ResetUniversalAngerTargetGoal<>(this, false));
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(WHITE, false);
+        this.entityData.define(SLEEPING, false);
+        this.entityData.define(CHARGING, false);
+        this.entityData.define(STOMPING, false);
     }
 
     //region Tick
@@ -117,26 +119,26 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
     public void tick() {
         super.tick();
 
-        if (!this.world.isClient) {
-            this.tickAngerLogic((ServerWorld)this.world, true);
+        if (!this.level.isClientSide) {
+            this.updatePersistentAnger((ServerLevel) this.level, true);
             if (this.isScared > 0) this.isScared--;
 
-            if (this.world.isNight() && this.isScared == 0) {
+            if (this.level.isNight() && this.isScared == 0) {
                 if (this.sleepTime > 0) this.sleepTime--;
                 if (this.sleepTime == -1) {
-                    this.sleepTime = SLEEP_TIME.get(this.random);
+                    this.sleepTime = SLEEP_TIME.sample(this.random);
                 }
 
                 if (this.sleepTime == 0) {
-                    getDataTracker().set(SLEEPING, true);
+                    entityData.set(SLEEPING, true);
                 }
             } else {
                 this.sleepTime = -1;
-                getDataTracker().set(SLEEPING, false);
+                entityData.set(SLEEPING, false);
             }
 
             if (this.random.nextInt(1000) == 0 && this.angryAt == null) {
-                PlayerEntity nearestPlayer = this.world.getClosestPlayer(getX(), getY(), getZ(), 6, true);
+                Player nearestPlayer = this.level.getNearestPlayer(getX(), getY(), getZ(), 6, true);
                 if (nearestPlayer != null && this.random.nextInt(10) == 0) {
                     this.setTarget(nearestPlayer);
                 }
@@ -145,58 +147,57 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
     }
 
     @Override
-    protected void mobTick() {
-        this.eatGrassTimer = this.eatGrassGoal.getTimer();
-        super.mobTick();
+    protected void customServerAiStep() {
+        this.eatGrassTimer = this.eatGrassGoal.getEatAnimationTick();
+        super.customServerAiStep();
     }
 
     @Override
-    public void tickMovement() {
-        if (this.world.isClient) {
+    public void aiStep() {
+        if (this.level.isClientSide) {
             this.eatGrassTimer = Math.max(0, this.eatGrassTimer - 1);
         }
 
-        super.tickMovement();
+        super.aiStep();
     }
     //endregion
 
     @Override
-    public void handleStatus(byte status) {
+    public void handleEntityEvent(byte status) {
         if (status == 10) {
             this.eatGrassTimer = 40;
         } else {
-            super.handleStatus(status);
+            super.handleEntityEvent(status);
         }
     }
 
     @Override
-    public void onEatingGrass() {
-
+    public void ate() {
         this.heal(6f);
     }
 
     @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        EntityData data = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
+    public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType spawnReason, @Nullable SpawnGroupData entityData, @Nullable CompoundTag tag) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnReason, entityData, tag);
         this.setWhite(this.random.nextInt(50000) == 0);
         return data;
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity player) {
+    public boolean canBeLeashed(@NotNull Player player) {
         return false;
     }
 
     //region Damage
     @Override
-    public boolean damage(DamageSource source, float amount) {
+    public boolean hurt(@NotNull DamageSource source, float amount) {
         if (!this.isInvulnerableTo(source)) {
-            this.isScared = SCARED_TIME.get(this.random);
+            this.isScared = SCARED_TIME.sample(this.random);
         }
         if (source.isFire()) {
             amount = amount / 2;
         }
-        return super.damage(source, amount);
+        return super.hurt(source, amount);
     }
 
     @Override
@@ -211,8 +212,8 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
     //region Breeding
     @Nullable
     @Override
-    public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-        RhinoEntity rhino = ModEntities.RHINO.get().create(world);
+    public AgeableMob getBreedOffspring(@NotNull ServerLevel level, @NotNull AgeableMob entity) {
+        RhinoEntity rhino = ModEntities.RHINO.get().create(level);
         if (rhino != null && entity instanceof RhinoEntity rhinoEntity) {
             rhino.setWhite(rhinoEntity.isWhite() && this.isWhite());
         }
@@ -220,52 +221,52 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack stack) {
+    public boolean isFood(@NotNull ItemStack stack) {
         return BREEDING_INGREDIENT.test(stack);
     }
     //endregion
 
     //region Nbt
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        this.readAngerFromNbt(this.world, nbt);
-        this.dataTracker.set(WHITE, nbt.getBoolean("White"));
-        this.dataTracker.set(SLEEPING, nbt.getBoolean("Sleeping"));
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        this.readPersistentAngerSaveData(this.level, tag);
+        this.entityData.set(WHITE, tag.getBoolean("White"));
+        this.entityData.set(SLEEPING, tag.getBoolean("Sleeping"));
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        this.writeAngerToNbt(nbt);
-        nbt.putBoolean("White", isWhite());
-        nbt.putBoolean("Sleeping", isSleeping());
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        this.addPersistentAngerSaveData(tag);
+        tag.putBoolean("White", isWhite());
+        tag.putBoolean("Sleeping", isSleeping());
     }
     //endregion
 
     //region State Management
     public boolean isWhite() {
-        return this.dataTracker.get(WHITE);
+        return this.entityData.get(WHITE);
     }
 
     public void setWhite(boolean white) {
-        this.dataTracker.set(WHITE, white);
+        this.entityData.set(WHITE, white);
     }
 
     public boolean isSleeping() {
-        return this.dataTracker.get(SLEEPING);
+        return this.entityData.get(SLEEPING);
     }
 
     public boolean isCharging() {
-        return this.dataTracker.get(CHARGING);
+        return this.entityData.get(CHARGING);
     }
 
     public boolean isStomping() {
-        return this.dataTracker.get(STOMPING);
+        return this.entityData.get(STOMPING);
     }
 
     public void setStomping(boolean stomping) {
-        this.dataTracker.set(STOMPING, stomping);
+        this.entityData.set(STOMPING, stomping);
     }
 
     public void setImmuneToFire(boolean immuneToFire) {
@@ -276,35 +277,35 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
 
     //region Anger Control
     @Override
-    public int getAngerTime() {
+    public int getRemainingPersistentAngerTime() {
         return this.angerTime;
     }
 
     @Override
-    public void setAngerTime(int angerTime) {
+    public void setRemainingPersistentAngerTime(int angerTime) {
         this.angerTime = angerTime;
     }
 
     @Nullable
     @Override
-    public UUID getAngryAt() {
+    public UUID getPersistentAngerTarget() {
         return this.angryAt;
     }
 
     @Override
-    public void setAngryAt(@Nullable UUID angryAt) {
+    public void setPersistentAngerTarget(@Nullable UUID angryAt) {
         this.angryAt = angryAt;
     }
 
     @Override
-    public void chooseRandomAngerTime() {
-        this.setAngerTime(ANGER_TIME_RANGE.get(this.random));
+    public void startPersistentAngerTimer() {
+        this.setRemainingPersistentAngerTime(ANGER_TIME_RANGE.sample(this.random));
     }
 
     @Override
     public void setTarget(@Nullable LivingEntity target) {
         super.setTarget(target);
-        getDataTracker().set(CHARGING, target != null);
+        entityData.set(CHARGING, target != null);
     }
     //endregion
 
@@ -312,7 +313,7 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
     private <E extends IAnimatable> PlayState walkCycle(AnimationEvent<E> event) {
         var builder = new AnimationBuilder();
         if (event.isMoving()) {
-            builder.addAnimation("animation.rhino.walk", true);
+            builder.addAnimation("animation.rhino.walking", true);
         } else if (!isSleeping()) {
             builder.addAnimation("animation.rhino.idle", true);
         }
@@ -345,7 +346,7 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
 
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "walk_controller", 10, this::walkCycle));
+        data.addAnimationController(new AnimationController<>(this, "walk_controller", 5, this::walkCycle));
         data.addAnimationController(new AnimationController<>(this, "action_controller", 15, this::actionCycle));
     }
 
@@ -353,6 +354,19 @@ public class RhinoEntity extends AnimalEntity implements Angerable, IAnimatable,
     public AnimationFactory getFactory() {
         return factory;
     }
+    //endregion
 
+    //region Texture
+    @Override
+    public EntityModel getEntityModel() {
+        return EntityModel.RHINO;
+    }
+
+    @Override
+    public ResourceLocation getITexture() {
+        String texture = this.isWhite() ? "white" : "black";
+        if (this.isSleeping()) texture +="_sleeping";
+        return new ResourceLocation(Goodall.MOD_ID, "textures/entity/rhino/"+texture+".png");
+    }
     //endregion
 }

@@ -1,52 +1,56 @@
 package tech.thatgravyboat.goodall.common.entity.goals;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.LootableContainerBlockEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.ConfiguredStructureFeatureTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.World;
-import tech.thatgravyboat.goodall.common.entity.BoobyEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.StructureTags;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
+import tech.thatgravyboat.goodall.common.entity.PelicanEntity;
 import tech.thatgravyboat.goodall.common.registry.ModBlocks;
 
 import java.util.EnumSet;
 
 public class FindTreasure extends Goal {
 
-    private final BoobyEntity mob;
+    private final PelicanEntity mob;
     private boolean noPathToStructure;
 
-    public FindTreasure(BoobyEntity dolphin) {
+    public FindTreasure(PelicanEntity dolphin) {
         this.mob = dolphin;
-        this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
+        this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
-    public boolean canStop() {
+    @Override
+    public boolean isInterruptable() {
         return false;
     }
 
-    public boolean canStart() {
+    @Override
+    public boolean canUse() {
         return this.mob.hasFish();
     }
 
-    public boolean shouldContinue() {
+    @Override
+    public boolean canContinueToUse() {
         BlockPos blockPos = this.mob.getTreasurePos();
-        return !(new BlockPos(blockPos.getX(), this.mob.getY(), blockPos.getZ())).isWithinDistance(this.mob.getPos(), 4.0D) && !this.noPathToStructure;
+        return !(new BlockPos(blockPos.getX(), this.mob.getY(), blockPos.getZ())).closerToCenterThan(this.mob.position(), 4.0D) && !this.noPathToStructure;
     }
 
+    @Override
     public void start() {
-        if (this.mob.world instanceof ServerWorld serverWorld) {
+        if (this.mob.level instanceof ServerLevel serverLevel) {
             this.noPathToStructure = false;
             this.mob.getNavigation().stop();
-            BlockPos blockPos2 = serverWorld.locateStructure(ConfiguredStructureFeatureTags.ON_TREASURE_MAPS, this.mob.getBlockPos(), 50, false);
+            BlockPos blockPos2 = serverLevel.findNearestMapStructure(StructureTags.ON_TREASURE_MAPS, this.mob.blockPosition(), 50, false);
             if (blockPos2 != null) {
-                blockPos2 = goUpTillAir(serverWorld, blockPos2, 10);
+                blockPos2 = goUpTillAir(serverLevel, blockPos2, 10);
             }
             if (blockPos2 != null) {
                 this.mob.setTreasurePos(blockPos2);
@@ -56,44 +60,46 @@ public class FindTreasure extends Goal {
         }
     }
 
+    @Override
     public void stop() {
-        World world = this.mob.world;
+        Level level = this.mob.level;
         BlockPos blockPos = this.mob.getTreasurePos();
-        if ((new BlockPos(blockPos.getX(), this.mob.getY(), blockPos.getZ())).isWithinDistance(this.mob.getPos(), 4.0D) || this.noPathToStructure) {
+        if ((new BlockPos(blockPos.getX(), this.mob.getY(), blockPos.getZ())).closerToCenterThan(this.mob.position(), 4.0D) || this.noPathToStructure) {
             if (!this.noPathToStructure) {
-                if (this.mob.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
-                    BlockState down = world.getBlockState(blockPos.down());
-                    if (world.isTopSolid(blockPos.down(), this.mob) && world.isAir(blockPos) && !down.isOf(ModBlocks.CROSS.get())) {
-                        world.setBlockState(blockPos, ModBlocks.CROSS.get().getDefaultState());
+                if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                    BlockState down = level.getBlockState(blockPos.below());
+                    if (level.loadedAndEntityCanStandOn(blockPos.below(), this.mob) && level.isEmptyBlock(blockPos) && !down.is(ModBlocks.CROSS.get())) {
+                        level.setBlockAndUpdate(blockPos, ModBlocks.CROSS.get().defaultBlockState());
                     }
                 }
-                world.sendEntityStatus(this.mob, (byte)38);
+                level.broadcastEntityEvent(this.mob, (byte)38);
             }
             this.mob.setFish(false);
         }
     }
 
+    @Override
     public void tick() {
-        if (!isNearTarget() || this.mob.getNavigation().isIdle()) {
-            Vec3d vec3d = Vec3d.ofCenter(this.mob.getTreasurePos());
-            this.mob.getLookControl().lookAt(vec3d.x, vec3d.y, vec3d.z, (float)(this.mob.getMaxHeadRotation() + 20), (float)this.mob.getMaxLookPitchChange());
-            this.mob.getNavigation().startMovingTo(vec3d.x, vec3d.y, vec3d.z, 1D);
+        if (!isNearTarget() || this.mob.getNavigation().isDone()) {
+            Vec3 vec3d = Vec3.atCenterOf(this.mob.getTreasurePos());
+            this.mob.getLookControl().setLookAt(vec3d.x, vec3d.y, vec3d.z, (float)(this.mob.getMaxHeadYRot() + 20), (float)this.mob.getMaxHeadXRot());
+            this.mob.getNavigation().moveTo(vec3d.x, vec3d.y, vec3d.z, 1D);
         }
     }
 
     protected boolean isNearTarget() {
         BlockPos blockPos = this.mob.getNavigation().getTargetPos();
-        return blockPos != null && blockPos.isWithinDistance(this.mob.getPos(), 12.0D);
+        return blockPos != null && blockPos.closerToCenterThan(this.mob.position(), 12.0D);
     }
 
-    public BlockPos goUpTillAir(World world, BlockPos pos, int maxAmount) {
-        BlockPos topMost = new BlockPos(pos.getX(), world.getTopY(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ()), pos.getZ());
-        if (!world.isAir(topMost)) return null;
-        BlockPos.Mutable newPos = topMost.mutableCopy();
+    public BlockPos goUpTillAir(Level level, BlockPos pos, int maxAmount) {
+        BlockPos topMost = new BlockPos(pos.getX(), level.getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX(), pos.getZ()), pos.getZ());
+        if (!level.isEmptyBlock(topMost)) return null;
+        BlockPos.MutableBlockPos newPos = topMost.mutable();
 
         for (int i = 0; i < maxAmount; i++) {
-            BlockEntity possibleChest = world.getBlockEntity(newPos.move(Direction.DOWN));
-            if (possibleChest instanceof LootableContainerBlockEntity)
+            BlockEntity possibleChest = level.getBlockEntity(newPos.move(Direction.DOWN));
+            if (possibleChest instanceof RandomizableContainerBlockEntity)
                 return topMost;
         }
         return null;

@@ -1,87 +1,87 @@
 package tech.thatgravyboat.goodall.common.entity.base;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityGroup;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.pathing.PathNodeType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Random;
+public abstract class WaterAnimalEntity extends Animal {
 
-public abstract class WaterAnimalEntity extends AnimalEntity {
-
-    protected WaterAnimalEntity(EntityType<? extends AnimalEntity> entityType, World world) {
-        super(entityType, world);
-        this.setPathfindingPenalty(PathNodeType.WATER, 0.0F);
+    protected WaterAnimalEntity(EntityType<? extends Animal> entityType, Level level) {
+        super(entityType, level);
+        this.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
     }
 
     @Override
-    public boolean canBreatheInWater() {
+    public boolean canBreatheUnderwater() {
         return true;
     }
 
     @Override
-    public EntityGroup getGroup() {
-        return EntityGroup.AQUATIC;
+    public MobType getMobType() {
+        return MobType.WATER;
     }
 
     @Override
-    public boolean canSpawn(WorldView world) {
-        return world.doesNotIntersectEntities(this);
+    public boolean checkSpawnObstruction(LevelReader level) {
+        return level.isUnobstructed(this);
     }
 
     @Override
-    public int getMinAmbientSoundDelay() {
+    public int getAmbientSoundInterval() {
         return 120;
     }
 
     @Override
-    protected int getXpToDrop(PlayerEntity player) {
-        return 1 + this.world.random.nextInt(3);
+    public int getExperienceReward() {
+        return 1 + this.level.random.nextInt(3);
     }
 
     protected void tickWaterBreathingAir(int air) {
-        if (this.isAlive() && !this.isInsideWaterOrBubbleColumn()) {
-            this.setAir(air - 1);
-            if (this.getAir() == -20) {
-                this.setAir(0);
-                this.damage(DamageSource.DROWN, 2.0F);
+        if (this.isAlive() && !this.isInWaterOrBubble()) {
+            this.setAirSupply(air - 1);
+            if (this.getAirSupply() == -20) {
+                this.setAirSupply(0);
+                this.hurt(DamageSource.DROWN, 2.0F);
             }
         } else {
-            this.setAir(300);
+            this.setAirSupply(300);
         }
     }
 
     @Override
     public void baseTick() {
-        int i = this.getAir();
+        int i = this.getAirSupply();
         super.baseTick();
         this.tickWaterBreathingAir(i);
     }
 
     @Override
-    public boolean isPushedByFluids() {
+    public boolean isPushedByFluid() {
         return false;
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity player) {
+    public boolean canBeLeashed(@NotNull Player player) {
         return false;
     }
 
-    public static boolean canSpawn(EntityType<? extends WaterCreatureEntity> type, WorldAccess world, SpawnReason reason, BlockPos pos, Random random) {
-        int i = world.getSeaLevel();
+    public static boolean canSpawn(EntityType<? extends WaterAnimal> type, LevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+        int i = level.getSeaLevel();
         int j = i - 13;
-        return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.down()).isIn(FluidTags.WATER) && world.getBlockState(pos.up()).isOf(Blocks.WATER);
+        return pos.getY() >= j && pos.getY() <= i && level.getFluidState(pos.below()).is(FluidTags.WATER) && level.getBlockState(pos.above()).is(Blocks.WATER);
     }
 
 }

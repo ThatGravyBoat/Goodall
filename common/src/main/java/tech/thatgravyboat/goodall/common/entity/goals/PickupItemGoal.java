@@ -1,15 +1,15 @@
 package tech.thatgravyboat.goodall.common.entity.goals;
 
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.item.ItemEntity;
 import tech.thatgravyboat.goodall.common.entity.base.ItemPicker;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class PickupItemGoal<T extends MobEntity & ItemPicker> extends Goal {
+public class PickupItemGoal<T extends Mob & ItemPicker> extends Goal {
 
     private int cooldown;
 
@@ -19,7 +19,7 @@ public class PickupItemGoal<T extends MobEntity & ItemPicker> extends Goal {
     private final T mob;
 
     public PickupItemGoal(T mob, double speed) {
-        this(mob, speed, item -> !item.cannotPickup() && item.isAlive() && mob.canPickupItem(item.getStack()));
+        this(mob, speed, item -> !item.hasPickUpDelay() && item.isAlive() && mob.canHoldItem(item.getItem()));
     }
 
     public PickupItemGoal(T mob, double speed, Predicate<ItemEntity> pickupPredicate) {
@@ -27,7 +27,7 @@ public class PickupItemGoal<T extends MobEntity & ItemPicker> extends Goal {
     }
 
     public PickupItemGoal(T mob, double speed, Predicate<ItemEntity> pickupPredicate, double range) {
-        this.setControls(EnumSet.of(Control.MOVE));
+        this.setFlags(EnumSet.of(Flag.MOVE));
         this.mob = mob;
         this.pickupPredicate = pickupPredicate;
         this.range = range;
@@ -37,21 +37,21 @@ public class PickupItemGoal<T extends MobEntity & ItemPicker> extends Goal {
     }
 
     @Override
-    public boolean canStart() {
+    public boolean canUse() {
         if (this.cooldown > 0) {
             this.cooldown--;
             return false;
         }
 
-        if (mob.canPickUpItems() && mob.getTarget() == null && mob.getAttacker() == null) {
-            return !this.mob.world.getEntitiesByClass(ItemEntity.class, this.mob.getBoundingBox().expand(8.0D), pickupPredicate).isEmpty();
+        if (mob.canPickUpItems() && mob.getTarget() == null && mob.getLastHurtMob() == null) {
+            return !this.mob.level.getEntitiesOfClass(ItemEntity.class, this.mob.getBoundingBox().inflate(8.0D), pickupPredicate).isEmpty();
         }
         return false;
     }
 
     @Override
-    public boolean shouldContinue() {
-        return mob.canPickUpItems() && mob.getTarget() == null && mob.getAttacker() == null;
+    public boolean canContinueToUse() {
+        return mob.canPickUpItems() && mob.getTarget() == null && mob.getLastHurtMob() == null;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class PickupItemGoal<T extends MobEntity & ItemPicker> extends Goal {
 
     public void goToNearbyItems() {
         List<ItemEntity> itemsNearby = getItemsNearby();
-        if (!itemsNearby.isEmpty()) this.mob.getNavigation().startMovingTo(itemsNearby.get(0), this.speed);
+        if (!itemsNearby.isEmpty()) this.mob.getNavigation().moveTo(itemsNearby.get(0), this.speed);
     }
 
     private List<ItemEntity> getItemsNearby() {
-        return this.mob.world.getEntitiesByClass(ItemEntity.class, this.mob.getBoundingBox().expand(this.range), pickupPredicate);
+        return this.mob.level.getEntitiesOfClass(ItemEntity.class, this.mob.getBoundingBox().inflate(this.range), pickupPredicate);
     }
 }

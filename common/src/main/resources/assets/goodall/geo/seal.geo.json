@@ -6,7 +6,7 @@
 				"identifier": "geometry.seal",
 				"texture_width": 64,
 				"texture_height": 64,
-				"visible_bounds_width": 5,
+				"visible_bounds_width": 4,
 				"visible_bounds_height": 1.5,
 				"visible_bounds_offset": [0, 0.25, 0]
 			},
@@ -23,8 +23,8 @@
 					"parent": "body",
 					"pivot": [0, 4, -3],
 					"cubes": [
-						{"origin": [-4, 0, -9], "size": [8, 7, 6], "uv": [28, 31]},
-						{"origin": [-2.5, 0, -11], "size": [5, 4, 2], "uv": [9, 37]}
+						{"origin": [-3.5, 0, -9], "size": [7, 7, 6], "uv": [26, 30]},
+						{"origin": [-1.5, 0, -11], "size": [3, 3, 2], "uv": [0, 0]}
 					]
 				},
 				{
@@ -40,7 +40,7 @@
 					"parent": "body",
 					"pivot": [-5.5, 2, -2],
 					"cubes": [
-						{"origin": [-6, 0, -2], "size": [1, 4, 7], "uv": [0, 37]}
+						{"origin": [-6, 0, -2], "size": [1, 4, 7], "uv": [0, 36]}
 					]
 				},
 				{
@@ -48,7 +48,7 @@
 					"parent": "body",
 					"pivot": [0, 2.5, 10],
 					"cubes": [
-						{"origin": [-3, 0, 10], "size": [6, 5, 11], "uv": [0, 21]}
+						{"origin": [-3, 0, 10], "size": [6, 5, 10], "uv": [0, 21]}
 					]
 				},
 				{
@@ -56,7 +56,7 @@
 					"parent": "tail",
 					"pivot": [0, 2.5, 20],
 					"cubes": [
-						{"origin": [-5, 2, 19], "size": [10, 1, 6], "uv": [23, 21]}
+						{"origin": [-5, 2, 18], "size": [10, 1, 6], "uv": [22, 21]}
 					]
 				}
 			]

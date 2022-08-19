@@ -1,0 +1,348 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.toucan.idle": {
+			"loop": true,
+			"animation_length": 6.88,
+			"start_delay": "0",
+			"loop_delay": "0",
+			"bones": {
+				"body": {
+					"rotation": {
+						"0.0": {
+							"vector": [5, 0, 0]
+						},
+						"3.24": {
+							"vector": [10, 0, 0]
+						},
+						"6.88": {
+							"vector": [5, 0, 0]
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [-5, 0, 0]
+						},
+						"3.24": {
+							"vector": [2.5, 0, 0]
+						},
+						"6.88": {
+							"vector": [-5, 0, 0]
+						}
+					}
+				},
+				"wing0": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 2.5]
+						},
+						"6.88": {
+							"vector": [0, 0, 2.5]
+						}
+					}
+				},
+				"wing1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, -2.5]
+						},
+						"6.88": {
+							"vector": [0, 0, -2.5]
+						}
+					}
+				},
+				"tailv": {
+					"rotation": {
+						"0.0": {
+							"vector": [-57.5, 0, 0]
+						},
+						"4.04": {
+							"vector": [-80, 0, 0],
+							"easing": "easeInQuart"
+						},
+						"6.88": {
+							"vector": [-57.5, 0, 0],
+							"easing": "easeInOutExpo"
+						}
+					}
+				}
+			}
+		},
+		"animation.toucan.fly": {
+			"loop": true,
+			"animation_length": 0.52,
+			"start_delay": "0",
+			"loop_delay": "0",
+			"bones": {
+				"bone": {
+					"rotation": {
+						"0.0": {
+							"vector": [22.5, 0, 0]
+						},
+						"0.52": {
+							"vector": [22.5, 0, 0]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 1, 0]
+						},
+						"0.28": {
+							"vector": [0, 0.6, 0]
+						},
+						"0.44": {
+							"vector": [0, 2.6, 0]
+						},
+						"0.52": {
+							"vector": [0, 1, 0]
+						}
+					}
+				},
+				"body": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [0, -1, 0]
+						},
+						"0.52": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [-10, 0, 0]
+						},
+						"0.12": {
+							"vector": [5, 0, 0]
+						},
+						"0.36": {
+							"vector": [-31.42857, 0, 0],
+							"easing": "easeInOutQuint"
+						},
+						"0.52": {
+							"vector": [-10, 0, 0]
+						}
+					}
+				},
+				"wing0": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 75]
+						},
+						"0.24": {
+							"vector": [0, 0, 100],
+							"easing": "easeOutQuad"
+						},
+						"0.36": {
+							"vector": [0, 0, 22.5],
+							"easing": "easeInCubic"
+						},
+						"0.52": {
+							"vector": [0, 0, 75]
+						}
+					}
+				},
+				"wing1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, -70]
+						},
+						"0.24": {
+							"vector": [0, 0, -102.5],
+							"easing": "easeOutQuad"
+						},
+						"0.36": {
+							"vector": [0, 0, -20],
+							"easing": "easeInCubic"
+						},
+						"0.52": {
+							"vector": [0, 0, -70]
+						}
+					}
+				},
+				"tailv": {
+					"rotation": {
+						"0.0": {
+							"vector": [-67.5, 0, 0]
+						},
+						"0.52": {
+							"vector": [-67.5, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"animation.toucan.walking": {
+			"loop": true,
+			"animation_length": 0.68,
+			"start_delay": "0",
+			"loop_delay": "0",
+			"bones": {
+				"bone": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.04": {
+							"vector": [0, 0, 0]
+						},
+						"0.12": {
+							"vector": [0, 2, 0]
+						},
+						"0.32": {
+							"vector": [0, 0, 0]
+						},
+						"0.68": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"body": {
+					"rotation": {
+						"0.0": {
+							"vector": [-7.5, 0, 0]
+						},
+						"0.04": {
+							"vector": [5, 0, 0]
+						},
+						"0.16": {
+							"vector": [-7.5, 0, 0]
+						},
+						"0.28": {
+							"vector": [11.78571, 0, 0]
+						},
+						"0.44": {
+							"vector": [2.5, 0, 0]
+						},
+						"0.68": {
+							"vector": [-7.5, 0, 0]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, -1, 0]
+						},
+						"0.12": {
+							"vector": [0, 0, 0]
+						},
+						"0.68": {
+							"vector": [0, -1, 0]
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [-7.5, 0, 0]
+						},
+						"0.12": {
+							"vector": [18.40909, 0, 0]
+						},
+						"0.24": {
+							"vector": [-21.61932, 0, 0]
+						},
+						"0.44": {
+							"vector": [5, 0, 0]
+						},
+						"0.68": {
+							"vector": [-7.5, 0, 0]
+						}
+					}
+				},
+				"wing0": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 17.5]
+						},
+						"0.16": {
+							"vector": [0, 0, 0]
+						},
+						"0.32": {
+							"vector": [0, 0, 17.5]
+						},
+						"0.68": {
+							"vector": [0, 0, 17.5]
+						}
+					}
+				},
+				"wing1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, -17.5]
+						},
+						"0.16": {
+							"vector": [0, 0, -2.5]
+						},
+						"0.32": {
+							"vector": [0, 0, -17.5]
+						},
+						"0.68": {
+							"vector": [0, 0, -17.5]
+						}
+					}
+				},
+				"leg0": {
+					"rotation": {
+						"0.0": {
+							"vector": [-2.5, 0, 0]
+						},
+						"0.2": {
+							"vector": [35, 0, 0]
+						},
+						"0.36": {
+							"vector": [-2.5, 0, 0]
+						}
+					}
+				},
+				"leg1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.2": {
+							"vector": [37.5, 0, 0]
+						},
+						"0.36": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"tailv": {
+					"rotation": {
+						"0.0": {
+							"vector": [20, 0, 0]
+						},
+						"0.24": {
+							"vector": [-70, 0, 0]
+						},
+						"0.68": {
+							"vector": [20, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"animation.toucan.sit": {
+			"loop": true,
+			"bones": {
+				"body": {
+					"position": {
+						"vector": [0, -1, 0]
+					}
+				},
+				"tailv": {
+					"rotation": {
+						"vector": [-17.5, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

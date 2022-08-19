@@ -1,36 +1,33 @@
 package tech.thatgravyboat.goodall.common.entity;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MovementType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.control.AquaticMoveControl;
-import net.minecraft.entity.ai.control.YawAdjustingLookControl;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.ai.pathing.EntityNavigation;
-import net.minecraft.entity.ai.pathing.SwimNavigation;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.SmoothSwimmingLookControl;
+import net.minecraft.world.entity.ai.control.SmoothSwimmingMoveControl;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -48,54 +45,54 @@ import java.util.Random;
 
 public class ManateeEntity extends WaterAnimalEntity implements IAnimatable, IEntityModel {
 
-    private static final TrackedData<Integer> MOISTNESS = DataTracker.registerData(ManateeEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(Items.SEAGRASS);
+    private static final EntityDataAccessor<Integer> MOISTNESS = SynchedEntityData.defineId(ManateeEntity.class, EntityDataSerializers.INT);
+    private static final Ingredient BREEDING_INGREDIENT = Ingredient.of(Items.SEAGRASS);
 
     private final AnimationFactory factory = new AnimationFactory(this);
 
-    public ManateeEntity(EntityType<? extends WaterAnimalEntity> entityType, World world) {
+    public ManateeEntity(EntityType<? extends WaterAnimalEntity> entityType, Level world) {
         super(entityType, world);
-        this.moveControl = new AquaticMoveControl(this, 85, 10, 0.02F, 0.1F, true);
-        this.lookControl = new YawAdjustingLookControl(this, 10);
+        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, true);
+        this.lookControl = new SmoothSwimmingLookControl(this, 10);
     }
 
-    public static DefaultAttributeContainer.Builder createManateeAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 14.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5D)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0D);
+    public static AttributeSupplier.Builder createManateeAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 14.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.5D)
+                .add(Attributes.ATTACK_DAMAGE, 1.0D);
     }
 
-    public static boolean canManateeSpawn(EntityType<? extends MobEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
-        if (spawnReason == SpawnReason.SPAWNER) return true;
+    public static boolean canManateeSpawn(EntityType<? extends Mob> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
+        if (spawnReason == MobSpawnType.SPAWNER) return true;
         int i = world.getSeaLevel();
         int j = i - 13;
-        return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.down()).isIn(FluidTags.WATER) && world.getBlockState(pos.up()).isOf(Blocks.WATER);
+        return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.below()).is(FluidTags.WATER) && world.getBlockState(pos.above()).is(Blocks.WATER);
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        this.dataTracker.startTracking(MOISTNESS, 2400);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(MOISTNESS, 2400);
     }
 
     @Override
-    protected void initGoals() {
-        this.goalSelector.add(0, new BreatheAirGoal(this));
-        this.goalSelector.add(0, new MoveIntoWaterGoal(this));
-        this.goalSelector.add(2, new AnimalMateGoal(this, 1.0D));
-        this.goalSelector.add(3, new TemptGoal(this, 1.0D, BREEDING_INGREDIENT, false));
-        this.goalSelector.add(4, new SwimAroundGoal(this, 1.0D, 10));
-        this.goalSelector.add(5, new LookAroundGoal(this));
-        this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 6.0F));
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new BreathAirGoal(this));
+        this.goalSelector.addGoal(0, new TryFindWaterGoal(this));
+        this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.0D, BREEDING_INGREDIENT, false));
+        this.goalSelector.addGoal(4, new RandomSwimmingGoal(this, 1.0D, 10));
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
     }
 
     @Nullable
     @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        EntityData data = super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
-        this.setAir(this.getMaxAir());
-        if (world.getRandom().nextFloat() < 0.2F) {
+    public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType spawnReason, @Nullable SpawnGroupData entityData, @Nullable CompoundTag tag) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnReason, entityData, tag);
+        this.setAirSupply(this.getMaxAirSupply());
+        if (level.getRandom().nextFloat() < 0.2F) {
             this.setBaby(true);
         }
         return data;
@@ -104,30 +101,30 @@ public class ManateeEntity extends WaterAnimalEntity implements IAnimatable, IEn
     //region Breeding
     @Nullable
     @Override
-    public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-        return this.world.random.nextBoolean() ? null : ModEntities.MANATEE.get().create(world);
+    public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob entity) {
+        return level.random.nextBoolean() ? null : ModEntities.MANATEE.get().create(level);
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack stack) {
+    public boolean isFood(ItemStack stack) {
         return BREEDING_INGREDIENT.test(stack);
     }
     //endregion
 
     //region Movement
     @Override
-    protected EntityNavigation createNavigation(World world) {
-        return new SwimNavigation(this, world);
+    protected PathNavigation createNavigation(@NotNull Level level) {
+        return new WaterBoundPathNavigation(this, level);
     }
 
     @Override
-    public void travel(Vec3d movementInput) {
-        if (this.canMoveVoluntarily() && this.isTouchingWater()) {
-            this.updateVelocity(this.getMovementSpeed(), movementInput);
-            this.move(MovementType.SELF, this.getVelocity());
-            this.setVelocity(this.getVelocity().multiply(0.9D));
+    public void travel(@NotNull Vec3 movementInput) {
+        if (this.isEffectiveAi() && this.isInWater()) {
+            this.moveRelative(this.getSpeed(), movementInput);
+            this.move(MoverType.SELF, this.getDeltaMovement());
+            this.setDeltaMovement(this.getDeltaMovement().scale(0.9D));
             if (this.getTarget() == null) {
-                this.addVelocity(0.0D, -0.005D, 0.0D);
+                this.push(0.0D, -0.005D, 0.0D);
             }
         } else {
             super.travel(movementInput);
@@ -137,59 +134,59 @@ public class ManateeEntity extends WaterAnimalEntity implements IAnimatable, IEn
 
     //region Nbt
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
+    public void readAdditionalSaveData(@NotNull CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
         setMoistness(nbt.getInt("Moistness"));
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
+    public void addAdditionalSaveData(@NotNull CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
         nbt.putInt("Moistness", getMoistness());
     }
     //endregion
 
     //region Air
     @Override
-    public int getMaxAir() {
+    public int getMaxAirSupply() {
         return 4800;
     }
 
     @Override
-    protected int getNextAirOnLand(int air) {
-        return getMaxAir();
+    protected int increaseAirSupply(int air) {
+        return getMaxAirSupply();
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (this.isAiDisabled()) {
-            this.setAir(this.getMaxAir());
+        if (this.isNoAi()) {
+            this.setAirSupply(this.getMaxAirSupply());
         } else {
-            if (this.isWet()) {
+            if (this.isInWaterRainOrBubble()) {
                 this.setMoistness(2400);
             } else {
                 this.setMoistness(this.getMoistness() - 1);
                 if (this.getMoistness() <= 0) {
-                    this.damage(DamageSource.DRYOUT, 1.0F);
+                    this.hurt(DamageSource.DRY_OUT, 1.0F);
                 }
 
                 if (this.onGround) {
-                    this.addVelocity(this.random.nextFloat() * 0.4F - 0.2F, 0.5D, this.random.nextFloat() * 0.4F - 0.2F);
-                    this.setYaw(this.random.nextFloat() * 360.0F);
+                    this.push(this.random.nextFloat() * 0.4F - 0.2F, 0.5D, this.random.nextFloat() * 0.4F - 0.2F);
+                    this.setYRot(this.random.nextFloat() * 360.0F);
                     this.onGround = false;
-                    this.velocityDirty = true;
+                    this.hasImpulse = true;
                 }
             }
         }
     }
 
     public int getMoistness() {
-        return this.dataTracker.get(MOISTNESS);
+        return this.entityData.get(MOISTNESS);
     }
 
     public void setMoistness(int moistness) {
-        this.dataTracker.set(MOISTNESS, moistness);
+        this.entityData.set(MOISTNESS, moistness);
     }
     //endregion
 
@@ -207,7 +204,7 @@ public class ManateeEntity extends WaterAnimalEntity implements IAnimatable, IEn
 
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "walk_controller", 10, this::walkCycle));
+        data.addAnimationController(new AnimationController<>(this, "walk_controller", 5, this::walkCycle));
     }
 
     @Override

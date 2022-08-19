@@ -1,26 +1,31 @@
 package tech.thatgravyboat.goodall.common.entity.base;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import tech.thatgravyboat.goodall.Goodall;
 
 public enum EntityModel {
-    DUMBO(new Identifier(Goodall.MOD_ID, "geo/dumbo.geo.json"), null, new Identifier(Goodall.MOD_ID, "animations/dumbo.animation.json")),
-    BOOBY("booby"),
+    DUMBO("dumbo"),
+    PELICAN("pelican"),
     FENNEC("fennec_fox"),
     FLAMINGO("flamingo"),
     KIWI("kiwi"),
     MANATEE("manatee"),
-    REDDEER("red_deer");
+    SONGBIRD("songbird"),
+    TOUCAN("toucan"),
+    TORTOISE("tortoise"),
+    DEER("deer"),
+    SEAL("seal"),
+    RHINO("rhino");
 
-    public final Identifier model;
-    public final Identifier texture;
-    public final Identifier animation;
+    public final ResourceLocation model;
+    public final ResourceLocation texture;
+    public final ResourceLocation animation;
 
     EntityModel(String id) {
-        this(new Identifier(Goodall.MOD_ID, "geo/"+id+".geo.json"), new Identifier(Goodall.MOD_ID, "textures/entity/"+id+".png"), new Identifier(Goodall.MOD_ID, "animations/"+id+".animation.json"));
+        this(new ResourceLocation(Goodall.MOD_ID, "geo/"+id+".geo.json"), new ResourceLocation(Goodall.MOD_ID, "textures/entity/"+id+".png"), new ResourceLocation(Goodall.MOD_ID, "animations/"+id+".animation.json"));
     }
 
-    EntityModel(Identifier model, Identifier texture, Identifier animation) {
+    EntityModel(ResourceLocation model, ResourceLocation texture, ResourceLocation animation) {
         this.model = model;
         this.texture = texture;
         this.animation = animation;

@@ -1,61 +1,66 @@
 package tech.thatgravyboat.goodall.client;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.renderers.geo.GeoItemRenderer;
-import tech.thatgravyboat.goodall.client.renderer.base.BaseModel;
+import tech.thatgravyboat.goodall.client.particles.KrillParticle;
 import tech.thatgravyboat.goodall.client.renderer.base.BaseRenderer;
 import tech.thatgravyboat.goodall.client.renderer.deerhead.DeerHeadBlockItemRenderer;
 import tech.thatgravyboat.goodall.client.renderer.dumbo.DumboRenderer;
 import tech.thatgravyboat.goodall.client.renderer.fennecfox.FennecFoxRenderer;
-import tech.thatgravyboat.goodall.client.renderer.flamingo.FlamingoRenderer;
-import tech.thatgravyboat.goodall.client.renderer.manatee.ManateeRenderer;
-import tech.thatgravyboat.goodall.client.renderer.rhino.RhinoRenderer;
-import tech.thatgravyboat.goodall.client.renderer.seal.SealRenderer;
-import tech.thatgravyboat.goodall.client.renderer.whitedeer.WhiteDeerRenderer;
-import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.registry.ModBlocks;
 import tech.thatgravyboat.goodall.common.registry.ModEntities;
 import tech.thatgravyboat.goodall.common.registry.ModItems;
+import tech.thatgravyboat.goodall.common.registry.ModParticles;
+
+import java.util.function.Supplier;
 
 public class GoodallClient {
 
     public static void init() {
-        registerEntityRenderer(ModEntities.RHINO.get(), RhinoRenderer::new);
+        registerEntityRenderer(ModEntities.RHINO.get(), BaseRenderer::ofBabyBase);
         registerEntityRenderer(ModEntities.DUMBO.get(), DumboRenderer::new);
-        registerEntityRenderer(ModEntities.BOOBY.get(), createRenderer(new BaseModel<>()));
+        registerEntityRenderer(ModEntities.PELICAN.get(), BaseRenderer::ofBase);
         registerEntityRenderer(ModEntities.FENNEC_FOX.get(), FennecFoxRenderer::new);
-        registerEntityRenderer(ModEntities.KIWI.get(), createRenderer(new BaseModel<>()));
-        registerEntityRenderer(ModEntities.MANATEE.get(), ManateeRenderer::new);
-        registerEntityRenderer(ModEntities.SEAL.get(), SealRenderer::new);
-        registerEntityRenderer(ModEntities.WHITE_DEER.get(), WhiteDeerRenderer::new);
-        registerEntityRenderer(ModEntities.RED_DEER.get(), createRenderer(new BaseModel<>()));
-        registerEntityRenderer(ModEntities.FLAMINGO.get(), FlamingoRenderer::new);
+        registerEntityRenderer(ModEntities.KIWI.get(), BaseRenderer::ofBase);
+        registerEntityRenderer(ModEntities.MANATEE.get(), BaseRenderer::ofBabyBase);
+        registerEntityRenderer(ModEntities.SEAL.get(), BaseRenderer::ofBase);
+        registerEntityRenderer(ModEntities.DEER.get(), BaseRenderer::ofBase);
+        registerEntityRenderer(ModEntities.FLAMINGO.get(), BaseRenderer::ofBabyBase);
+        registerEntityRenderer(ModEntities.SONGBIRD.get(), BaseRenderer::ofBase);
+        registerEntityRenderer(ModEntities.TOUCAN.get(), BaseRenderer::ofBase);
+        registerEntityRenderer(ModEntities.TORTOISE.get(), BaseRenderer::ofBabyBase);
+        registerEntityRenderer(ModEntities.KRILL.get(), NoopRenderer::new);
         registerDeerHeadBlockRenderer(ModBlocks.DEER_HEAD_ENTITY.get());
         registerItemRenderer(ModItems.DEER_HEAD.get(), new DeerHeadBlockItemRenderer());
-        registerBlockLayer(ModBlocks.CROSS.get(), RenderLayer.getTranslucent());
+        registerBlockLayer(ModBlocks.CROSS.get(), RenderType.translucent());
     }
 
-    private static <T extends MobEntity & IAnimatable & IEntityModel> EntityRendererFactory<T> createRenderer(AnimatedGeoModel<T> model) {
-        return ctx -> new BaseRenderer<>(ctx, model);
+    public static void initParticleFactories() {
+        registerParticleFactory(ModParticles.KRILL, KrillParticle.Factory::new);
     }
 
     @ExpectPlatform
-    public static void registerBlockLayer(Block block, RenderLayer layer) {
+    public static void registerBlockLayer(Block block, RenderType layer) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static <T extends Entity> void registerEntityRenderer(EntityType<T> type, EntityRendererFactory<T> factory) {
+    public static <T extends Entity> void registerEntityRenderer(EntityType<T> type, EntityRendererProvider<T> factory) {
         throw new AssertionError();
     }
 
@@ -67,5 +72,16 @@ public class GoodallClient {
     @ExpectPlatform
     public static void registerItemRenderer(Item item, GeoItemRenderer renderer) {
         throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static void registerParticleFactory(Supplier<SimpleParticleType> particle, SpriteAwareFactory<SimpleParticleType> factory) {
+        throw new AssertionError();
+    }
+
+    @FunctionalInterface
+    @Environment(EnvType.CLIENT)
+    public interface SpriteAwareFactory<T extends ParticleOptions> {
+        @NotNull ParticleProvider<T> create(SpriteSet spriteProvider);
     }
 }

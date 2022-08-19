@@ -1,60 +1,6 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.kiwi.idle": {
-			"loop": true,
-			"animation_length": 13.12,
-			"start_delay": "0",
-			"loop_delay": "0",
-			"bones": {
-				"head": {
-					"rotation": {
-						"0.0": {
-							"vector": [-5, 0, 0]
-						},
-						"6.72": {
-							"vector": [-12.44898, 0, 0]
-						},
-						"13.12": {
-							"vector": [-5, 0, 0]
-						}
-					}
-				},
-				"body": {
-					"rotation": {
-						"0.0": {
-							"vector": [-4.94219, 0.02052, 0.53375]
-						},
-						"3.4": {
-							"vector": [-7.34944, 0.98553, 7.97178],
-							"easing": "easeInOutSine"
-						},
-						"7.12": {
-							"vector": [-12.39117, 0.02052, 0.53375],
-							"easing": "easeOutSine"
-						},
-						"9.8": {
-							"vector": [-9.04829, -0.76769, -4.40388],
-							"easing": "easeInSine"
-						},
-						"13.12": {
-							"vector": [-4.94219, 0.02052, 0.53375]
-						}
-					},
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"6.96": {
-							"vector": [0, 0.5, 0]
-						},
-						"13.12": {
-							"vector": [0, 0, 0]
-						}
-					}
-				}
-			}
-		},
 		"animation.kiwi.walk": {
 			"loop": true,
 			"animation_length": 1.12,
@@ -151,6 +97,142 @@
 						},
 						"1.12": {
 							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"animation.kiwi.walking": {
+			"loop": true,
+			"animation_length": 1.12,
+			"start_delay": "0",
+			"loop_delay": "0",
+			"bones": {
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [-12.5, 0, 0]
+						},
+						"0.32": {
+							"vector": [12.5, 0, 0]
+						},
+						"0.6": {
+							"vector": [-12.5, 0, 0]
+						},
+						"0.84": {
+							"vector": [12.5, 0, 0]
+						},
+						"1.12": {
+							"vector": [-12.5, 0, 0]
+						}
+					},
+					"position": {
+						"vector": [0, 0, 0.9]
+					}
+				},
+				"body": {
+					"rotation": {
+						"0.0": {
+							"vector": [7.5, 0, 0]
+						},
+						"0.24": {
+							"vector": [-5, 0, 0]
+						},
+						"0.52": {
+							"vector": [7.5, 0, 0]
+						},
+						"0.8": {
+							"vector": [-5, 0, 0]
+						},
+						"1.12": {
+							"vector": [7.5, 0, 0]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, -0.75, 0]
+						},
+						"0.24": {
+							"vector": [0, -0.25, 0]
+						},
+						"0.52": {
+							"vector": [0, -0.75, 0]
+						},
+						"0.8": {
+							"vector": [0, -0.25, 0]
+						},
+						"1.12": {
+							"vector": [0, -0.75, 0]
+						}
+					}
+				},
+				"left_leg": {
+					"position": {
+						"0.0": {
+							"vector": [0, 1, 0]
+						},
+						"0.32": {
+							"vector": [0, 0, 0]
+						},
+						"0.6": {
+							"vector": [0, 0.16, 0]
+						},
+						"0.88": {
+							"vector": [0, 0.16, 0]
+						},
+						"1.12": {
+							"vector": [0, 1, 0]
+						}
+					}
+				},
+				"right_leg": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [0, 0, 0]
+						},
+						"0.52": {
+							"vector": [0, 1, 0]
+						},
+						"0.8": {
+							"vector": [0, 0, 0]
+						},
+						"1.12": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"animation.kiwi.idle": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"body": {
+					"rotation": {
+						"0.0": {
+							"vector": [2, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						},
+						"2.0": {
+							"vector": [2, 0, 0]
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [-4.5, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						},
+						"2.0": {
+							"vector": [-4.5, 0, 0]
 						}
 					}
 				}

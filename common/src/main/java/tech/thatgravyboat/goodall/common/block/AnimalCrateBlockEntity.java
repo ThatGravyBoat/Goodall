@@ -1,24 +1,24 @@
 package tech.thatgravyboat.goodall.common.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tech.thatgravyboat.goodall.common.registry.ModBlocks;
 
 public class AnimalCrateBlockEntity extends BlockEntity {
 
     private int timer;
-    private NbtCompound entity;
+    private CompoundTag entity;
     @Nullable
     private SoundEvent entitySound;
 
@@ -26,47 +26,47 @@ public class AnimalCrateBlockEntity extends BlockEntity {
         super(ModBlocks.ANIMAL_CRATE_ENTITY.get(), pos, state);
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, AnimalCrateBlockEntity blockEntity) {
+    public static void tick(Level level, BlockPos pos, BlockState state, AnimalCrateBlockEntity blockEntity) {
         if (blockEntity.entitySound != null) {
             blockEntity.timer++;
-            if (blockEntity.timer + (world.random.nextInt(20)) >= 200) {
+            if (blockEntity.timer + (level.random.nextInt(20)) >= 200) {
                 blockEntity.timer = 0;
-                world.playSound(null, pos, blockEntity.entitySound, SoundCategory.BLOCKS, 1f, 1f);
+                level.playSound(null, pos, blockEntity.entitySound, SoundSource.BLOCKS, 1f, 1f);
             }
         }
     }
 
-    public void summonEntity(World world, BlockPos pos) {
+    public void summonEntity(Level level, BlockPos pos) {
         if (this.entity == null) return;
-        if (!(world instanceof ServerWorld serverWorld)) return;
-        EntityType.fromNbt(this.entity)
-            .map(type -> type.create(serverWorld))
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        EntityType.by(this.entity)
+            .map(type -> type.create(serverLevel))
             .ifPresent(entity -> {
-                entity.readNbt(this.entity);
-                entity.updatePositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
-                serverWorld.spawnEntity(entity);
+                entity.load(this.entity);
+                entity.absMoveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
+                serverLevel.addFreshEntity(entity);
             });
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void load(@NotNull CompoundTag nbt) {
+        super.load(nbt);
         if (nbt.contains("Entity")) {
             this.entity = nbt.getCompound("Entity");
         }
         if (nbt.contains("Sound")) {
-            this.entitySound = Registry.SOUND_EVENT.getOrEmpty(Identifier.tryParse(nbt.getString("Sound"))).orElse(null);
+            this.entitySound = Registry.SOUND_EVENT.getOptional(ResourceLocation.tryParse(nbt.getString("Sound"))).orElse(null);
         }
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void saveAdditional(@NotNull CompoundTag nbt) {
+        super.saveAdditional(nbt);
         if (entity != null) {
             nbt.put("Entity", entity);
         }
         if (entitySound != null) {
-            nbt.putString("Sound", entitySound.getId().toString());
+            nbt.putString("Sound", entitySound.getLocation().toString());
         }
     }
 }

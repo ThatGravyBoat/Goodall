@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "#goodall:songbird_spawns",
+  "spawners" : {
+    "type": "goodall:songbird",
+    "weight": 3,
+    "minCount": 1,
+    "maxCount": 3
+  }
+}

@@ -1,23 +1,24 @@
 package tech.thatgravyboat.goodall.common.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -33,9 +34,9 @@ import tech.thatgravyboat.goodall.common.entity.base.IEntityModel;
 import tech.thatgravyboat.goodall.common.registry.ModEntities;
 import tech.thatgravyboat.goodall.common.registry.ModSounds;
 
-public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntityModel {
+public class FlamingoEntity extends Animal implements IAnimatable, IEntityModel {
 
-    private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(Items.COD);
+    private static final Ingredient BREEDING_INGREDIENT = Ingredient.of(Items.COD, Items.TROPICAL_FISH, Items.SALMON);
 
     private final AnimationFactory factory = new AnimationFactory(this);
 
@@ -46,31 +47,31 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntity
     public float flapSpeed = 1.0F;
     private float nextFlap = 1.0F;
 
-    public FlamingoEntity(EntityType<? extends AnimalEntity> entityType, World world) {
-        super(entityType, world);
+    public FlamingoEntity(EntityType<? extends Animal> entityType, Level level) {
+        super(entityType, level);
     }
 
-    public static DefaultAttributeContainer.Builder createFlamingoAttributes() {
-        return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 20D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 16D);
-    }
-
-    @Override
-    protected void initGoals() {
-        this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new EscapeDangerGoal(this, 1.1D));
-        this.goalSelector.add(2, new AnimalMateGoal(this, 1.0D));
-        this.goalSelector.add(3, new TemptGoal(this, 1.0D, BREEDING_INGREDIENT, false));
-        this.goalSelector.add(4, new FollowParentGoal(this, 0.45D));
-        this.goalSelector.add(5, new WanderAroundFarGoal(this, 1.0D));
-        this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 6.0F));
-        this.goalSelector.add(7, new LookAroundGoal(this));
+    public static AttributeSupplier.Builder createFlamingoAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 20D)
+                .add(Attributes.MOVEMENT_SPEED, 0.3D)
+                .add(Attributes.FOLLOW_RANGE, 16D);
     }
 
     @Override
-    public double getSwimHeight() {
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new PanicGoal(this, 1.1D));
+        this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.0D, BREEDING_INGREDIENT, false));
+        this.goalSelector.addGoal(4, new FollowParentGoal(this, 0.45D));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+    }
+
+    @Override
+    public double getFluidJumpThreshold() {
         return 1.1;
     }
 
@@ -83,43 +84,43 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntity
 
     @Nullable
     @Override
-    protected SoundEvent getHurtSound(DamageSource source) {
+    protected SoundEvent getHurtSound(@NotNull DamageSource source) {
         return ModSounds.FLAMINGO_HURT.get();
     }
     //endregion
 
     //region Wings
     @Override
-    public void tickMovement() {
-        super.tickMovement();
+    public void aiStep() {
+        super.aiStep();
         this.prevFlapProgress = this.flapProgress;
         this.prevMaxWingDeviation = this.maxWingDeviation;
-        this.maxWingDeviation = MathHelper.clamp(this.maxWingDeviation + (this.onGround ? -0.3F : 1.2F), 0.0F, 1.0F);
+        this.maxWingDeviation = Mth.clamp(this.maxWingDeviation + (this.onGround ? -0.3F : 1.2F), 0.0F, 1.0F);
         if (!this.onGround && this.flapSpeed < 1.0F) {
             this.flapSpeed = 1.0F;
         }
 
         this.flapSpeed *= 0.9F;
-        Vec3d vec3d = this.getVelocity();
+        Vec3 vec3d = this.getDeltaMovement();
         if (!this.onGround && vec3d.y < 0.0D) {
-            this.setVelocity(vec3d.multiply(1.0D, 0.6D, 1.0D));
+            this.setDeltaMovement(vec3d.multiply(1.0D, 0.6D, 1.0D));
         }
 
         this.flapProgress += this.flapSpeed * 2.0F;
     }
 
     @Override
-    protected boolean hasWings() {
-        return this.speed > this.nextFlap;
+    protected boolean isFlapping() {
+        return this.flyDist > this.nextFlap;
     }
 
     @Override
-    protected void addFlapEffects() {
-        this.nextFlap = this.speed + this.maxWingDeviation / 2.0F;
+    protected void onFlap() {
+        this.nextFlap = this.flyDist + this.maxWingDeviation / 2.0F;
     }
 
     @Override
-    public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+    public boolean causeFallDamage(float fallDistance, float damageMultiplier, @NotNull DamageSource damageSource) {
         return false;
     }
     //endregion
@@ -127,12 +128,12 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntity
     //region Breeding
     @Nullable
     @Override
-    public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) {
-        return ModEntities.FLAMINGO.get().create(world);
+    public AgeableMob getBreedOffspring(@NotNull ServerLevel level, @NotNull AgeableMob entity) {
+        return ModEntities.FLAMINGO.get().create(level);
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack stack) {
+    public boolean isFood(@NotNull ItemStack stack) {
         return BREEDING_INGREDIENT.test(stack);
     }
     //endregion
@@ -141,7 +142,7 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntity
     private <E extends IAnimatable> PlayState walkCycle(AnimationEvent<E> event) {
         var builder = new AnimationBuilder();
         if (event.isMoving() && this.onGround) {
-            builder.addAnimation("animation.flamingo.walk", true);
+            builder.addAnimation("animation.flamingo.walking", true);
         } else if (!this.onGround) {
             builder.addAnimation("animation.flamingo.fly", true);
         } else {
@@ -172,8 +173,8 @@ public class FlamingoEntity extends AnimalEntity implements IAnimatable, IEntity
     }
 
     @Override
-    public Identifier getITexture() {
-        return this.isBaby() ? new Identifier(Goodall.MOD_ID, "textures/entity/baby_flamingo.png") : IEntityModel.super.getITexture();
+    public ResourceLocation getITexture() {
+        return this.isBaby() ? new ResourceLocation(Goodall.MOD_ID, "textures/entity/flamingo/baby.png") : new ResourceLocation(Goodall.MOD_ID, "textures/entity/flamingo/normal.png");
     }
 
     //endregion

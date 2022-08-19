@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "#goodall:pelican_spawns",
+  "spawners" : {
+    "type": "goodall:pelican",
+    "weight": 4,
+    "minCount": 0,
+    "maxCount": 1
+  }
+}

@@ -1,46 +1,43 @@
 package tech.thatgravyboat.goodall.client.renderer.fennecfox;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.model.json.ModelTransformation;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib3.geo.render.built.GeoBone;
 import software.bernie.geckolib3.util.RenderUtils;
-import tech.thatgravyboat.goodall.client.renderer.MobEntityRenderer;
 import tech.thatgravyboat.goodall.client.renderer.base.BaseModel;
 import tech.thatgravyboat.goodall.client.renderer.base.BaseRenderer;
 import tech.thatgravyboat.goodall.common.entity.FennecFoxEntity;
 
 public class FennecFoxRenderer extends BaseRenderer<FennecFoxEntity> {
 
-    public FennecFoxRenderer(EntityRendererFactory.Context ctx) {
-        super(ctx, new BaseModel<>());
+    public FennecFoxRenderer(EntityRendererProvider.Context ctx) {
+        super(ctx, new BaseModel<>(), false);
     }
 
     @Override
-    public void renderRecursively(GeoBone bone, MatrixStack stack, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+    public void renderRecursively(GeoBone bone, PoseStack stack, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         if (bone.name.equals("head") && !this.mainHand.isEmpty()) {
-            stack.push();
+            stack.pushPose();
             RenderUtils.translate(bone, stack);
             RenderUtils.moveToPivot(bone, stack);
             RenderUtils.rotate(bone, stack);
             RenderUtils.scale(bone, stack);
             RenderUtils.moveBackFromPivot(bone, stack);
 
-            stack.multiply(Vec3f.NEGATIVE_Z.getDegreesQuaternion(90));
+            stack.mulPose(Vector3f.ZN.rotationDegrees(90));
             stack.translate(-0.275, -0.1, -0.6);
             stack.scale(0.5f, 0.5f, 0.5f);
 
-            MinecraftClient.getInstance().getItemRenderer().renderItem(this.mainHand, ModelTransformation.Mode.FIRST_PERSON_LEFT_HAND, packedLightIn, packedOverlayIn, stack, this.rtb, 0);
+            Minecraft.getInstance().getItemRenderer().renderStatic(this.mainHand, ItemTransforms.TransformType.FIRST_PERSON_LEFT_HAND, packedLightIn, packedOverlayIn, stack, this.rtb, 0);
 
-            stack.pop();
+            stack.popPose();
 
-            bufferIn = rtb.getBuffer(RenderLayer.getEntityTranslucent(whTexture));
+            bufferIn = rtb.getBuffer(RenderType.entityTranslucent(whTexture));
         }
         super.renderRecursively(bone, stack, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
     }

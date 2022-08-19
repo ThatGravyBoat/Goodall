@@ -1,25 +1,25 @@
 package tech.thatgravyboat.goodall.mixin;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PillagerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tech.thatgravyboat.goodall.common.entity.RhinoEntity;
 
-@Mixin(PillagerEntity.class)
-public abstract class PillagerEntityMixin extends MobEntity {
+@Mixin(Pillager.class)
+public abstract class PillagerEntityMixin extends Mob {
 
-    private PillagerEntityMixin(EntityType<? extends MobEntity> entityType, World world) {
+    private PillagerEntityMixin(EntityType<? extends Mob> entityType, Level world) {
         super(entityType, world);
     }
 
-    @Inject(method = "initGoals", at = @At("TAIL"))
+    @Inject(method = "registerGoals", at = @At("TAIL"))
     private void onInitGoals(CallbackInfo ci) {
-        this.targetSelector.add(3, new ActiveTargetGoal<>(this, RhinoEntity.class, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, RhinoEntity.class, true));
     }
 }

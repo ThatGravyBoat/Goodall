@@ -1,50 +1,51 @@
 package tech.thatgravyboat.goodall.common.block;
 
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tech.thatgravyboat.goodall.common.registry.ModBlocks;
 
-public class AnimalCrateBlock extends BlockWithEntity {
+public class AnimalCrateBlock extends BaseEntityBlock {
 
-    public AnimalCrateBlock(Settings settings) {
+    public AnimalCrateBlock(Properties settings) {
         super(settings);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return !world.isClient() ? checkType(type, ModBlocks.ANIMAL_CRATE_ENTITY.get(), AnimalCrateBlockEntity::tick) : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
+        return !level.isClientSide ? createTickerHelper(type, ModBlocks.ANIMAL_CRATE_ENTITY.get(), AnimalCrateBlockEntity::tick) : null;
     }
 
     @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
-        super.afterBreak(world, player, pos, state, blockEntity, stack);
-        if (!world.isClient && blockEntity instanceof AnimalCrateBlockEntity animalCrate) {
-            if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0) {
-                animalCrate.summonEntity(world, pos);
+    public void playerDestroy(@NotNull Level level, @NotNull Player player, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable BlockEntity blockEntity, @NotNull ItemStack stack) {
+        super.playerDestroy(level, player, pos, state, blockEntity, stack);
+        if (!level.isClientSide && blockEntity instanceof AnimalCrateBlockEntity animalCrate) {
+            if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0) {
+                animalCrate.summonEntity(level, pos);
             }
         }
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(@NotNull BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlocks.ANIMAL_CRATE_ENTITY.get().instantiate(pos, state);
+    public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
+        return ModBlocks.ANIMAL_CRATE_ENTITY.get().create(pos, state);
     }
 }

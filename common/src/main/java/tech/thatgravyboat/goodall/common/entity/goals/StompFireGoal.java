@@ -1,28 +1,28 @@
 package tech.thatgravyboat.goodall.common.entity.goals;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import tech.thatgravyboat.goodall.common.entity.RhinoEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StompFireGoal extends MoveToTargetPosGoal {
+public class StompFireGoal extends MoveToBlockGoal {
 
     private final List<BlockPos> offsets = new ArrayList<>();
     private final RhinoEntity rhino;
@@ -48,36 +48,36 @@ public class StompFireGoal extends MoveToTargetPosGoal {
     @Override
     public void tick() {
         super.tick();
-        if (hasReached()) {
-            this.rhino.lookAt(EntityAnchorArgumentType.EntityAnchor.FEET, Vec3d.ofCenter(this.targetPos));
+        if (isReachedTarget()) {
+            this.rhino.lookAt(EntityAnchorArgument.Anchor.FEET, Vec3.atCenterOf(this.blockPos));
             this.rhino.setImmuneToFire(true);
             this.rhino.setStomping(true);
             if (this.counter == 0) {
                 this.counter = 50;
             }
 
-            World world = this.rhino.world;
+            Level level = this.rhino.level;
 
-            if (this.counter == 2 && isTargetPos(world, this.targetPos)) {
-                if (world instanceof ServerWorld serverWorld) {
-                    BlockState state = world.getBlockState(this.targetPos.down());
-                    serverWorld.spawnParticles(
-                            new BlockStateParticleEffect(ParticleTypes.BLOCK, state),
+            if (this.counter == 2 && isValidTarget(level, this.blockPos)) {
+                if (level instanceof ServerLevel serverLevel) {
+                    BlockState state = level.getBlockState(this.blockPos.below());
+                    serverLevel.sendParticles(
+                            new BlockParticleOption(ParticleTypes.BLOCK, state),
                             this.rhino.getX(), this.rhino.getY(), this.rhino.getZ(),
                             100,
                             0.75, 0, 0.75,
                             5
                     );
-                    serverWorld.playSound(null, this.targetPos, SoundEvents.ENTITY_HOGLIN_STEP, SoundCategory.BLOCKS, 1f, 1f);
+                    serverLevel.playSound(null, this.blockPos, SoundEvents.HOGLIN_STEP, SoundSource.BLOCKS, 1f, 1f);
                 }
             }
 
-            if (this.counter == 1 && isTargetPos(world, this.targetPos)) {
-                BlockPos.stream(new Box(this.targetPos).expand(1)).forEach(pos -> {
-                    if (world.getBlockState(pos).isOf(Blocks.FIRE)) {
-                        world.removeBlock(pos, false);
-                        world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.4f, 0.4f);
-                        world.addParticle(ParticleTypes.LARGE_SMOKE, pos.getX(), pos.getY(), pos.getZ(), 0.0D, 0.0D, 0.0D);
+            if (this.counter == 1 && isValidTarget(level, this.blockPos)) {
+                BlockPos.betweenClosedStream(new AABB(this.blockPos).inflate(1)).forEach(pos -> {
+                    if (level.getBlockState(pos).is(Blocks.FIRE)) {
+                        level.removeBlock(pos, false);
+                        level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.4f, 0.4f);
+                        level.addParticle(ParticleTypes.LARGE_SMOKE, pos.getX(), pos.getY(), pos.getZ(), 0.0D, 0.0D, 0.0D);
                     }
                 });
             }
@@ -93,29 +93,29 @@ public class StompFireGoal extends MoveToTargetPosGoal {
     }
 
     @Override
-    public double getDesiredDistanceToTarget() {
+    public double acceptedDistance() {
         return 3;
     }
 
     @Override
-    protected boolean isTargetPos(WorldView world, BlockPos pos) {
-        Chunk chunk = world.getChunk(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()), ChunkStatus.FULL, false);
+    protected boolean isValidTarget(LevelReader world, BlockPos pos) {
+        ChunkAccess chunk = world.getChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()), ChunkStatus.FULL, false);
         if (chunk == null) {
             return false;
         } else {
-            return chunk.getBlockState(pos).isOf(Blocks.FIRE) && chunk.getBlockState(pos.up()).isAir();
+            return chunk.getBlockState(pos).is(Blocks.FIRE) && chunk.getBlockState(pos.above()).isAir();
         }
     }
 
     @Override
-    protected boolean findTargetPos() {
-        BlockPos blockPos = this.mob.getBlockPos();
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
+    protected boolean findNearestBlock() {
+        BlockPos blockPos = this.mob.blockPosition();
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 
         for (BlockPos offset : this.offsets) {
-            mutable.set(blockPos, offset);
-            if (this.mob.isInWalkTargetRange(mutable) && this.isTargetPos(this.mob.world, mutable)) {
-                this.targetPos = mutable;
+            mutable.setWithOffset(blockPos, offset);
+            if (this.mob.isWithinRestriction(mutable) && this.isValidTarget(this.mob.level, mutable)) {
+                this.blockPos = mutable;
                 return true;
             }
         }

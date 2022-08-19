@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "#goodall:tortoise_spawns",
+  "spawners" : {
+    "type": "goodall:tortoise",
+    "weight": 1,
+    "minCount": 0,
+    "maxCount": 1
+  }
+}

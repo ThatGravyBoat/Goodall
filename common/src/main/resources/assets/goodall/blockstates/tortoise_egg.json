@@ -1,0 +1,208 @@
+{
+  "variants": {
+    "eggs=1,hatch=0": [
+      {
+        "model": "goodall:block/tortoise_egg"
+      },
+      {
+        "model": "goodall:block/tortoise_egg",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/tortoise_egg",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/tortoise_egg",
+        "y": 270
+      }
+    ],
+    "eggs=1,hatch=1": [
+      {
+        "model": "goodall:block/slightly_cracked_tortoise_egg"
+      },
+      {
+        "model": "goodall:block/slightly_cracked_tortoise_egg",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/slightly_cracked_tortoise_egg",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/slightly_cracked_tortoise_egg",
+        "y": 270
+      }
+    ],
+    "eggs=1,hatch=2": [
+      {
+        "model": "goodall:block/very_cracked_tortoise_egg"
+      },
+      {
+        "model": "goodall:block/very_cracked_tortoise_egg",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/very_cracked_tortoise_egg",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/very_cracked_tortoise_egg",
+        "y": 270
+      }
+    ],
+    "eggs=2,hatch=0": [
+      {
+        "model": "goodall:block/two_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/two_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/two_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/two_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=2,hatch=1": [
+      {
+        "model": "goodall:block/two_slightly_cracked_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/two_slightly_cracked_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/two_slightly_cracked_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/two_slightly_cracked_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=2,hatch=2": [
+      {
+        "model": "goodall:block/two_very_cracked_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/two_very_cracked_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/two_very_cracked_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/two_very_cracked_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=3,hatch=0": [
+      {
+        "model": "goodall:block/three_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/three_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/three_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/three_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=3,hatch=1": [
+      {
+        "model": "goodall:block/three_slightly_cracked_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/three_slightly_cracked_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/three_slightly_cracked_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/three_slightly_cracked_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=3,hatch=2": [
+      {
+        "model": "goodall:block/three_very_cracked_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/three_very_cracked_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/three_very_cracked_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/three_very_cracked_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=4,hatch=0": [
+      {
+        "model": "goodall:block/four_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/four_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/four_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/four_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=4,hatch=1": [
+      {
+        "model": "goodall:block/four_slightly_cracked_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/four_slightly_cracked_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/four_slightly_cracked_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/four_slightly_cracked_tortoise_eggs",
+        "y": 270
+      }
+    ],
+    "eggs=4,hatch=2": [
+      {
+        "model": "goodall:block/four_very_cracked_tortoise_eggs"
+      },
+      {
+        "model": "goodall:block/four_very_cracked_tortoise_eggs",
+        "y": 90
+      },
+      {
+        "model": "goodall:block/four_very_cracked_tortoise_eggs",
+        "y": 180
+      },
+      {
+        "model": "goodall:block/four_very_cracked_tortoise_eggs",
+        "y": 270
+      }
+    ]
+  }
+}

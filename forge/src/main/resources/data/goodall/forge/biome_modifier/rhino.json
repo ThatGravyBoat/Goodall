@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "#goodall:rhino_spawns",
+  "spawners" : {
+    "type": "goodall:rhino",
+    "weight": 2,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

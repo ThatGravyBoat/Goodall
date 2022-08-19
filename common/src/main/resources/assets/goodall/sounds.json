@@ -12,19 +12,19 @@
       "goodall:flamingo-hurt"
     ]
   },
-  "booby.ambient": {
-    "subtitle": "subtitles.goodall.booby.ambient",
+  "pelican.ambient": {
+    "subtitle": "subtitles.goodall.pelican.ambient",
     "sounds": [
-      "goodall:booby-1",
-      "goodall:booby-2",
-      "goodall:booby-3",
-      "goodall:booby-4"
+      "goodall:pelican-1",
+      "goodall:pelican-2",
+      "goodall:pelican-3",
+      "goodall:pelican-4"
     ]
   },
-  "booby.hurt": {
-    "subtitle": "subtitles.goodall.booby.hurt",
+  "pelican.hurt": {
+    "subtitle": "subtitles.goodall.pelican.hurt",
     "sounds": [
-      "goodall:booby-hurt"
+      "goodall:pelican-hurt"
     ]
   },
   "seal.ambient": {

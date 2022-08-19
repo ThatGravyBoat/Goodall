@@ -1,31 +1,31 @@
 package tech.thatgravyboat.goodall.common.entity.goals.seal;
 
-import net.minecraft.entity.ai.pathing.AmphibiousPathNodeMaker;
-import net.minecraft.entity.ai.pathing.PathNodeNavigator;
-import net.minecraft.entity.ai.pathing.SwimNavigation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.pathfinder.AmphibiousNodeEvaluator;
+import net.minecraft.world.level.pathfinder.PathFinder;
 import tech.thatgravyboat.goodall.common.entity.SealEntity;
 
-public class SealSwimNavigation extends SwimNavigation {
+public class SealSwimNavigation extends WaterBoundPathNavigation {
 
-    public SealSwimNavigation(SealEntity owner, World world) {
-        super(owner, world);
+    public SealSwimNavigation(SealEntity owner, Level level) {
+        super(owner, level);
     }
 
     @Override
-    protected boolean isAtValidPosition() {
+    protected boolean canUpdatePath() {
         return true;
     }
 
     @Override
-    protected PathNodeNavigator createPathNodeNavigator(int range) {
-        this.nodeMaker = new AmphibiousPathNodeMaker(false);
-        return new PathNodeNavigator(this.nodeMaker, range);
+    protected PathFinder createPathFinder(int range) {
+        this.nodeEvaluator = new AmphibiousNodeEvaluator(false);
+        return new PathFinder(this.nodeEvaluator, range);
     }
 
     @Override
-    public boolean isValidPosition(BlockPos pos) {
-        return !this.world.getBlockState(pos.down()).isAir();
+    public boolean isStableDestination(BlockPos pos) {
+        return !this.level.getBlockState(pos.below()).isAir();
     }
 }

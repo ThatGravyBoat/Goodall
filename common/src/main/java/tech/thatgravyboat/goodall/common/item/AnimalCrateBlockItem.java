@@ -1,22 +1,22 @@
 package tech.thatgravyboat.goodall.common.item;
 
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.tag.TagKey;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tech.thatgravyboat.goodall.Goodall;
 import tech.thatgravyboat.goodall.common.registry.ModBlocks;
@@ -26,44 +26,44 @@ import java.util.List;
 
 public class AnimalCrateBlockItem extends BlockItem {
 
-    public static final TagKey<EntityType<?>> ALLOWED_ANIMALS = TagKey.of(Registry.ENTITY_TYPE_KEY, new Identifier(Goodall.MOD_ID, "crate_animals"));
+    public static final TagKey<EntityType<?>> ALLOWED_ANIMALS = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation(Goodall.MOD_ID, "crate_animals"));
 
-    public AnimalCrateBlockItem(Settings settings) {
+    public AnimalCrateBlockItem(Properties settings) {
         super(ModBlocks.ANIMAL_CRATE.get(), settings);
     }
 
     @Override
-    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        if ((!stack.hasNbt() || !stack.getOrCreateNbt().contains("BlockEntityTag")) && entity.getType().isIn(ALLOWED_ANIMALS)) {
-            NbtCompound entityTag = new NbtCompound();
-            if (entity.saveNbt(entityTag)) {
+    public InteractionResult interactLivingEntity(ItemStack stack, @NotNull Player user, @NotNull LivingEntity entity, @NotNull InteractionHand hand) {
+        if ((!stack.hasTag() || !stack.getOrCreateTag().contains("BlockEntityTag")) && entity.getType().is(ALLOWED_ANIMALS)) {
+            CompoundTag entityTag = new CompoundTag();
+            if (entity.save(entityTag)) {
                 entityTag.remove("UUID");
-                NbtCompound compound = stack.getOrCreateNbt();
-                NbtCompound blockTag = new NbtCompound();
+                CompoundTag compound = stack.getOrCreateTag();
+                CompoundTag blockTag = new CompoundTag();
                 blockTag.put("Entity", entityTag);
-                if (entity instanceof MobEntity mob && mob instanceof MobEntityAccessor accessor) {
+                if (entity instanceof Mob mob && mob instanceof MobEntityAccessor accessor) {
                     if (accessor.callGetAmbientSound() != null) {
-                        blockTag.putString("Sound", accessor.callGetAmbientSound().getId().toString());
+                        blockTag.putString("Sound", accessor.callGetAmbientSound().getLocation().toString());
                     }
                 }
                 compound.put("BlockEntityTag", blockTag);
-                compound.putString("EntityDisplayName", Text.Serializer.toJson(entity.getType().getName()));
-                stack.setNbt(compound);
-                user.setStackInHand(hand, stack);
+                compound.putString("EntityDisplayName", Component.Serializer.toJson(entity.getType().getDescription()));
+                stack.setTag(compound);
+                user.setItemInHand(hand, stack);
                 entity.discard();
-                return ActionResult.success(user.world.isClient());
+                return InteractionResult.sidedSuccess(user.level.isClientSide());
             }
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
-        return super.useOnEntity(stack, user, entity, hand);
+        return super.interactLivingEntity(stack, user, entity, hand);
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (stack.hasNbt() && stack.getOrCreateNbt().contains("EntityDisplayName")) {
-            Text display = Text.Serializer.fromJson(stack.getOrCreateNbt().getString("EntityDisplayName"));
-            tooltip.add(new TranslatableText("item.goodall.animal_crate.entity_name", display).formatted(Formatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag context) {
+        if (stack.hasTag() && stack.getOrCreateTag().contains("EntityDisplayName")) {
+            Component display = Component.Serializer.fromJson(stack.getOrCreateTag().getString("EntityDisplayName"));
+            tooltip.add(Component.translatable("item.goodall.animal_crate.entity_name", display).withStyle(ChatFormatting.GRAY));
         }
-        super.appendTooltip(stack, world, tooltip, context);
+        super.appendHoverText(stack, world, tooltip, context);
     }
 }

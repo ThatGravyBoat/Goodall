@@ -1,26 +1,13 @@
 package tech.thatgravyboat.goodall.common.registry.fabric;
 
-import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnRestriction;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.biome.Biome;
-import tech.thatgravyboat.goodall.common.registry.SpawnData;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 public class ModSpawnsImpl {
-    public static void registerSpawn(Biome.Category category, SpawnData data) {
-        BiomeModifications.addSpawn(BiomeSelectors.categories(category), data.entityType().getSpawnGroup(), data.entityType(), data.weight(), data.min(), data.max());
-    }
-
-    public static void registerSpawn(RegistryKey<Biome> biome, SpawnData data) {
-        BiomeModifications.addSpawn(BiomeSelectors.includeByKey(biome), data.entityType().getSpawnGroup(), data.entityType(), data.weight(), data.min(), data.max());
-    }
-
-    public static <T extends MobEntity> void setSpawnRules(EntityType<T> entityType, SpawnRestriction.Location location, Heightmap.Type type, SpawnRestriction.SpawnPredicate<T> predicate) {
+    public static <T extends Mob> void setSpawnRules(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types type, SpawnPlacements.SpawnPredicate<T> predicate) {
         SpawnRestrictionAccessor.callRegister(entityType, location, type, predicate);
     }
 }

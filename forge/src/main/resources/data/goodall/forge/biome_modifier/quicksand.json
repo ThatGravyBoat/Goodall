@@ -1,0 +1,8 @@
+{
+  "type": "forge:add_features",
+  "step": "vegetal_decoration",
+  "biomes": "#goodall:quicksand_generates",
+  "features" : [
+    "goodall:quicksand_common"
+  ]
+}

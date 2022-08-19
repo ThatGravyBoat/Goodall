@@ -1,67 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.fennec_fox.idle": {
-			"loop": true,
-			"animation_length": 12.48,
-			"start_delay": "0",
-			"loop_delay": "0",
-			"bones": {
-				"head": {
-					"rotation": {
-						"0.0": {
-							"vector": [-5, 0, 0]
-						},
-						"5.72": {
-							"vector": [-15, 0, 0]
-						},
-						"12.48": {
-							"vector": [-5, 0, 0]
-						}
-					},
-					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"5.44": {
-							"vector": [1, 1.1, 1],
-							"easing": "easeInOutQuint"
-						},
-						"9.84": {
-							"vector": [1, 1, 1],
-							"easing": "easeInCubic"
-						}
-					}
-				},
-				"body": {
-					"rotation": {
-						"0.0": {
-							"vector": [-5, 0, 0]
-						},
-						"5.28": {
-							"vector": [-7.5, 0, 0]
-						},
-						"12.48": {
-							"vector": [-5, 0, 0]
-						}
-					}
-				},
-				"tail": {
-					"rotation": {
-						"0.0": {
-							"vector": [-2.5, 0, 0]
-						},
-						"4.88": {
-							"vector": [5, 0, 0]
-						},
-						"12.48": {
-							"vector": [-2.5, 0, 0]
-						}
-					}
-				}
-			}
-		},
-		"animation.fennec_fox.walk": {
+		"animation.fennec_fox.walking": {
 			"loop": true,
 			"animation_length": 0.8,
 			"start_delay": "0",
@@ -69,15 +9,7 @@
 			"bones": {
 				"head": {
 					"rotation": {
-						"0.0": {
-							"vector": [-12.5, 0, 0]
-						},
-						"0.36": {
-							"vector": [12.5, 0, 0]
-						},
-						"0.72": {
-							"vector": [-12.5, 0, 0]
-						}
+						"vector": [0, 0, 0]
 					}
 				},
 				"body": {
@@ -262,17 +194,6 @@
 						"8.36": {
 							"vector": [0, -1, 0]
 						}
-					},
-					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"5.0": {
-							"vector": [1, 1.1, 1]
-						},
-						"8.36": {
-							"vector": [1, 1, 1]
-						}
 					}
 				},
 				"tail": {
@@ -297,12 +218,7 @@
 						}
 					},
 					"position": {
-						"0.0": {
-							"vector": [0, -1, 0]
-						},
-						"8.36": {
-							"vector": [0, -1, 0]
-						}
+						"vector": [0, -1, 0]
 					}
 				},
 				"whole": {
@@ -356,6 +272,38 @@
 						"3.04": {
 							"vector": [0, 0, 0],
 							"easing": "easeInExpo"
+						}
+					}
+				}
+			}
+		},
+		"animation.fennec_fox.idle": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [5, 0, 0]
+						},
+						"2.0": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"tail": {
+					"rotation": {
+						"0.0": {
+							"vector": [7.5, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						},
+						"2.0": {
+							"vector": [7.5, 0, 0]
 						}
 					}
 				}

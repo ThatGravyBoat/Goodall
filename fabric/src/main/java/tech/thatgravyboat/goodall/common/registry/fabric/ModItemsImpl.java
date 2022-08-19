@@ -1,14 +1,14 @@
 package tech.thatgravyboat.goodall.common.registry.fabric;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.EntityBucketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import tech.thatgravyboat.goodall.common.item.DeerHeadBlockItem;
 
 import java.util.LinkedHashMap;
@@ -19,8 +19,8 @@ public class ModItemsImpl {
 
     public static final Map<String, Supplier<Item>> ITEMS = new LinkedHashMap<>();
 
-    public static <T extends MobEntity> Supplier<SpawnEggItem> registerSpawnEgg(String id, Supplier<EntityType<T>> entity, int primary, int secondary, Item.Settings settings) {
-        SpawnEggItem item = new SpawnEggItem(entity.get(), primary, secondary, settings);
+    public static <T extends Mob> Supplier<SpawnEggItem> registerSpawnEgg(String id, Supplier<EntityType<T>> entity, int primary, int secondary, Item.Properties properties) {
+        SpawnEggItem item = new SpawnEggItem(entity.get(), primary, secondary, properties);
         ITEMS.put(id, () -> item);
         return () -> item;
     }
@@ -31,12 +31,12 @@ public class ModItemsImpl {
         return () -> item1;
     }
 
-    public static DeerHeadBlockItem createDeerHeadBlock(Block block, Item.Settings settings) {
-        return new DeerHeadBlockItem(block, settings);
+    public static DeerHeadBlockItem createDeerHeadBlock(Block block, Item.Properties properties) {
+        return new DeerHeadBlockItem(block, properties);
     }
 
-    public static <T extends Entity>  Supplier<EntityBucketItem> registerBucket(String id, Supplier<EntityType<T>> entity, Supplier<Fluid> fluid, Supplier<SoundEvent> soundEvent, Item.Settings settings) {
-        EntityBucketItem item1 = new EntityBucketItem(entity.get(), fluid.get(), soundEvent.get(), settings);
+    public static <T extends Entity>  Supplier<MobBucketItem> registerBucket(String id, Supplier<EntityType<T>> entity, Supplier<Fluid> fluid, Supplier<SoundEvent> soundEvent, Item.Properties properties) {
+        MobBucketItem item1 = new MobBucketItem(entity.get(), fluid.get(), soundEvent.get(), properties);
         ITEMS.put(id, () -> item1);
         return () -> item1;
     }
